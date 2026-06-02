@@ -6,6 +6,7 @@ TGF pretends to be a minimalistic cross-platform abstraction layer for common th
 > This project is in a premature development stage, don't use it, unless you are open to extend this for your specific needs.
 
 Features:
+- Works on C99 and C++20 out of the box (tested using clang++).
 - Window creation.
 - Keyboard and mouse input.
 - OpenGL context creation.
