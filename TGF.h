@@ -1644,9 +1644,11 @@ window_create(Window_Params* params)
   window->index  = window_array.len;
   window_array.len += 1;
 
+#ifdef TGF_OPENGL
   // @Review: Create the opengl context.
   B8 success = gl_context_create(window);
   UnusedVar(success);
+#endif
   
   // Show the window.
   SetForegroundWindow(hwnd);
