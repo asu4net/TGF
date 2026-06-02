@@ -476,32 +476,49 @@ typedef union Vec4
   F32 v[4];
 } Vec4;
 
+#define vec4(_x, _y, _z, _w) MakeStruct(Vec4, .x = _x, .y = _y, .z = _z, .w = _w)
+
+// ============================================
+// @: Mat4.
+// ============================================
+
+typedef struct Mat4
+{
+    // @Note: Row major matrix. First number is the row, Second is the column. (D3D11)
+    F32 _11, _12, _13, _14;
+    F32 _21, _22, _23, _24;
+    F32 _31, _32, _33, _34;
+    F32 _41, _42, _43, _44;
+} Mat4;
+
 // ============================================
 // @: Colors. (Vec4)
 // ============================================
 
-#define Vec4_White            MakeStruct(Vec4, .x=1.000f, .y=1.000f, .z=1.000f, .w=1.000f)
-#define Vec4_White_Faded      MakeStruct(Vec4, .x=1.000f, .y=1.000f, .z=1.000f, .w=0.000f)
-#define Vec4_Black            MakeStruct(Vec4, .x=0.000f, .y=0.000f, .z=0.000f, .w=1.000f)
-#define Vec4_Corn_Flower_Blue MakeStruct(Vec4, .x=0.388f, .y=0.584f, .z=0.933f, .w=1.000f)
-#define Vec4_Blue             MakeStruct(Vec4, .x=0.000f, .y=0.000f, .z=1.000f, .w=1.000f)
-#define Vec4_Light_Blue       MakeStruct(Vec4, .x=0.300f, .y=0.300f, .z=1.000f, .w=1.000f)
-#define Vec4_Cyan             MakeStruct(Vec4, .x=0.000f, .y=1.000f, .z=1.000f, .w=1.000f)
-#define Vec4_Gray             MakeStruct(Vec4, .x=0.500f, .y=0.500f, .z=0.500f, .w=1.000f)
-#define Vec4_Dark_Gray        MakeStruct(Vec4, .x=0.200f, .y=0.200f, .z=0.200f, .w=1.000f)
-#define Vec4_Green            MakeStruct(Vec4, .x=0.000f, .y=1.000f, .z=0.000f, .w=1.000f)
-#define Vec4_Light_Green      MakeStruct(Vec4, .x=0.300f, .y=1.000f, .z=0.300f, .w=1.000f)
-#define Vec4_Chill_Green      MakeStruct(Vec4, .x=0.047f, .y=0.651f, .z=0.408f, .w=1.000f)
-#define Vec4_Magenta          MakeStruct(Vec4, .x=1.000f, .y=0.000f, .z=1.000f, .w=1.000f)
-#define Vec4_Red              MakeStruct(Vec4, .x=1.000f, .y=0.000f, .z=0.000f, .w=1.000f)
-#define Vec4_Light_Red        MakeStruct(Vec4, .x=1.000f, .y=0.300f, .z=0.300f, .w=1.000f)
-#define Vec4_Yellow           MakeStruct(Vec4, .x=1.000f, .y=0.920f, .z=0.016f, .w=1.000f)
-#define Vec4_Orange           MakeStruct(Vec4, .x=0.970f, .y=0.600f, .z=0.110f, .w=1.000f)
+#define Vec4_White            vec4(1.000f, 1.000f, 1.000f, 1.000f)
+#define Vec4_White_Faded      vec4(1.000f, 1.000f, 1.000f, 0.000f)
+#define Vec4_Black            vec4(0.000f, 0.000f, 0.000f, 1.000f)
+#define Vec4_Corn_Flower_Blue vec4(0.388f, 0.584f, 0.933f, 1.000f)
+#define Vec4_Blue             vec4(0.000f, 0.000f, 1.000f, 1.000f)
+#define Vec4_Light_Blue       vec4(0.300f, 0.300f, 1.000f, 1.000f)
+#define Vec4_Cyan             vec4(0.000f, 1.000f, 1.000f, 1.000f)
+#define Vec4_Gray             vec4(0.500f, 0.500f, 0.500f, 1.000f)
+#define Vec4_Dark_Gray        vec4(0.200f, 0.200f, 0.200f, 1.000f)
+#define Vec4_Green            vec4(0.000f, 1.000f, 0.000f, 1.000f)
+#define Vec4_Light_Green      vec4(0.300f, 1.000f, 0.300f, 1.000f)
+#define Vec4_Chill_Green      vec4(0.047f, 0.651f, 0.408f, 1.000f)
+#define Vec4_Magenta          vec4(1.000f, 0.000f, 1.000f, 1.000f)
+#define Vec4_Red              vec4(1.000f, 0.000f, 0.000f, 1.000f)
+#define Vec4_Light_Red        vec4(1.000f, 0.300f, 0.300f, 1.000f)
+#define Vec4_Yellow           vec4(1.000f, 0.920f, 0.016f, 1.000f)
+#define Vec4_Orange           vec4(0.970f, 0.600f, 0.110f, 1.000f)
 
 
 // ============================================
 // @: Window.
 // ============================================
+
+#define MAX_WINDOWS 30
 
 typedef struct Window Window;
 struct Window 
@@ -534,6 +551,13 @@ window_create_default();
 
 void 
 window_destroy(Window* window);
+
+#ifdef TGF_OPENGL
+
+void
+window_swap_buffers(Window* window, bool vsync);
+
+#endif
 
 // ============================================
 // @: Input.
@@ -708,6 +732,43 @@ B8
 gl_context_create(Window* window);
 
 #endif
+
+// ============================================
+// @: OpenGL Context (Windows).
+// ============================================
+
+#if defined(TGF_OPENGL) && defined(TGF_WINDOWS)
+
+typedef BOOL  (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC)    (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
+typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
+typedef BOOL  (WINAPI * PFNWGLSWAPINTERVALEXTPROC)         (int interval);
+
+extern PFNWGLCHOOSEPIXELFORMATARBPROC    wglChoosePixelFormatARB;
+extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+extern PFNWGLSWAPINTERVALEXTPROC         wglSwapIntervalEXT;
+
+typedef struct GL_Win32_Context GL_Win32_Context;
+struct GL_Win32_Context 
+{ 
+  HGLRC handle = NULL;
+  HDC   device = NULL;
+};
+
+// @Note: 
+// This array it is just going to mimic the window array.
+// So creating a context just means occuping the same slot
+// as the window.
+
+extern GL_Win32_Context gl_context_array_win32[MAX_WINDOWS];
+
+#endif // defined(TGF_OPENGL) && defined(TGF_WINDOWS)
+
+// ============================================
+// @: Graphics.
+// ============================================
+
+void
+gpu_clear(Vec4 color);
 
 #endif // TINY_GAME_FRAMEWORK_H
 
@@ -1413,8 +1474,6 @@ input_key_down(Key key)
 // @i: Window.
 // ============================================
 
-#define MAX_WINDOWS 30
-
 #define WindowClassNameWin32 L"Window Class"
 
 #define WindowStyleWindowedWin32    WS_OVERLAPPEDWINDOW
@@ -1709,6 +1768,20 @@ window_destroy(Window* window)
   window_array.len -= 1;
 }
 
+#ifdef TGF_OPENGL
+
+void
+window_swap_buffers(Window* window, bool vsync)
+{
+  wglSwapIntervalEXT(vsync ? 1 : 0);
+  Check(window->handle != NULL);
+  GL_Win32_Context* context = &gl_context_array_win32[window->index];
+  Check(context->device != NULL);
+  SwapBuffers(context->device);
+}
+
+#endif
+
 #endif // TGF_WINDOWS
 
 // ============================================
@@ -1733,26 +1806,9 @@ ForOpenGLFunctions(DoFunctionPointerDefinitions)
 
 #if defined(TGF_OPENGL) && defined(TGF_WINDOWS)
 
-typedef struct GL_Win32_Context GL_Win32_Context;
-struct GL_Win32_Context 
-{ 
-  HGLRC handle = NULL;
-  HDC   device = NULL;
-};
-
-// @Note: 
-// This array it is just going to mimic the window array.
-// So creating a context just means occuping the same slot
-// as the window.
-
-
 GL_Win32_Context gl_context_array_win32[MAX_WINDOWS] = {ZeroStruct};
 
 // @Note: Windows sucks.
-
-typedef BOOL  (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC)    (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
-typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
-typedef BOOL  (WINAPI * PFNWGLSWAPINTERVALEXTPROC)         (int interval);
 
 PFNWGLCHOOSEPIXELFORMATARBPROC    wglChoosePixelFormatARB    = NULL;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = NULL;
@@ -1934,5 +1990,20 @@ gl_context_create(Window* window)
 }
 
 #endif // TGF_OPENGL && TGF_WINDOWS
+ 
+// ============================================
+// @i: Graphics (OpenGL).
+// ============================================
+
+#ifdef TGF_OPENGL
+
+void
+gpu_clear(Vec4 color)
+{
+  glClearColor(color.x, color.y, color.z, color.w);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+#endif
 
 #endif // TGF_IMPL

@@ -18,6 +18,7 @@ main(S32 argc, char** argv)
 
   while(!quit)
   {
+    gpu_clear(vec4(1.0f, 0.0f, 0.0f, 0.0f));
     input_poll_events();
     Input_Event_View view = input_events_this_frame();
     for EachIndex(i, view.len)
@@ -30,6 +31,7 @@ main(S32 argc, char** argv)
         break;
       }
     }
+    window_swap_buffers(window, /*vsync*/ true);
   }
   window_destroy(window);
 }
