@@ -21,5 +21,11 @@ Installation:
 - At least in one translation unit define `TGF_IMPL` and include `TGF.h`.
 - Enjoy.
 
+Linking:
+- Windows/OpenGL:
+    - gdi32    (Graphics Device Interface)
+    - winmm    (Windows Multimedia)
+    - opengl32 (OpenGL)
+
 > **Note:**
 > `build.bat` just builds `example.cpp`.
