@@ -555,7 +555,7 @@ window_destroy(Window* window);
 #ifdef TGF_OPENGL
 
 void
-window_swap_buffers(Window* window, bool vsync);
+window_swap_buffers(Window* window, B8 vsync);
 
 #endif
 
@@ -750,8 +750,8 @@ extern PFNWGLSWAPINTERVALEXTPROC         wglSwapIntervalEXT;
 typedef struct GL_Win32_Context GL_Win32_Context;
 struct GL_Win32_Context 
 { 
-  HGLRC handle = NULL;
-  HDC   device = NULL;
+  HGLRC handle;
+  HDC   device;
 };
 
 // @Note: 
@@ -1541,7 +1541,7 @@ internal_window_class_create_once_win32(Window_Params* params)
 
     if (!EnsureMsg(window_class_registered_win32 != 0, "Error! Couldn't register the Win32 window class."))
     {
-        return NULL;
+        return false;
     }
 
     Log("Win32 Window class registered!");
@@ -1771,7 +1771,7 @@ window_destroy(Window* window)
 #ifdef TGF_OPENGL
 
 void
-window_swap_buffers(Window* window, bool vsync)
+window_swap_buffers(Window* window, B8 vsync)
 {
   wglSwapIntervalEXT(vsync ? 1 : 0);
   Check(window->handle != NULL);
@@ -1813,6 +1813,7 @@ GL_Win32_Context gl_context_array_win32[MAX_WINDOWS] = {ZeroStruct};
 PFNWGLCHOOSEPIXELFORMATARBPROC    wglChoosePixelFormatARB    = NULL;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = NULL;
 PFNWGLSWAPINTERVALEXTPROC         wglSwapIntervalEXT         = NULL;
+HMODULE ogl = NULL;
 
 void*
 internal_gl_resolve_function(const char* name)
@@ -1820,13 +1821,16 @@ internal_gl_resolve_function(const char* name)
 	void* p = (void*) wglGetProcAddress(name);
 
 	// @Note: Illegal values returned by wglGetProcAddress.
-	if (p == nullptr     ||
+	if (p == NULL     ||
 		p == (void*) 0x1 ||
 		p == (void*) 0x2 ||
 		p == (void*) 0x3 ||
 		p == (void*) -1)
 	{
-		static HMODULE ogl = LoadLibrary(L"opengl32.dll");
+    if (ogl == NULL)
+    {
+		  ogl = LoadLibrary(L"opengl32.dll");
+    }
 		p = (void*) GetProcAddress(ogl, name);
 	}
 
