@@ -1,7 +1,7 @@
 // ============================================
 // @: Info.
 // ============================================
-
+//
 // Usage:
 //
 // 1. Just define TGF_IMPL before including in one *.c or *.cpp file.
@@ -18,7 +18,7 @@
 // Compile Flags:
 //
 // TGF_IMPL   Pastes the function implementations.
-// TGF_DEBUG  Enables Log, Check, Ensure macros.
+// TGF_DEBUG  Enables trace, check, ensure macros.
 // TGF_OPENGL Uses OpenGL.
 
 #ifndef TINY_GAME_FRAMEWORK_H
@@ -28,52 +28,46 @@
 // @: Platform detection.
 // ============================================
 
-// Platform detection using predefined macros.
 #ifdef _WIN32
-	/* Windows x64/x86 */
-	#ifdef _WIN64
-		/* Windows x64  */
-		#define TGF_WINDOWS
-	#else
-		/* Windows x86 */
-		#error "x86 Builds are not supported!"
-	#endif
-#elif defined(__APPLE__) || defined(__MACH__)
-	#include <TargetConditionals.h>
-	/* TARGET_OS_MAC exists on all the platforms
-	 * so we must check all of them (in this order)
-	 * to ensure that we're running on MAC
-	 * and not some other Apple platform */
-	#if TARGET_IPHONE_SIMULATOR == 1
-		#error "IOS simulator is not supported!"
-	#elif TARGET_OS_IPHONE == 1
-		#define TGF_IOS
-		#error "IOS is not supported!"
-	#elif TARGET_OS_MAC == 1
-		#define TGF_MACOS
-		#error "MacOS is not supported!"
-	#else
-		#error "Unknown Apple platform!"
-	#endif
-/* We also have to check __ANDROID__ before __linux__
- * since android is based on the linux kernel
- * it has __linux__ defined */
-#elif defined(__ANDROID__)
-	#define TGF_ANDROID
-	#error "Android is not supported!"
-#elif defined(__linux__)
-	#define TGF_LINUX 
-	#error "Linux is not supported!"
+#ifdef _WIN64
+#define TGF_WINDOWS
 #else
-	/* Unknown compiler/platform */
-	#error "Unknown platform!"
+#error "x86 Builds are not supported!"
+#endif
+#elif defined(__APPLE__) || defined(__MACH__)
+#include <TargetConditionals.h>
+// TARGET_OS_MAC exists on all the platforms
+// so we must check all of them (in this order)
+// to ensure that we're running on MAC
+// and not some other Apple platform.
+#if TARGET_IPHONE_SIMULATOR == 1
+#error "IOS simulator is not supported!"
+#elif TARGET_OS_IPHONE == 1
+#define TGF_IOS
+#error "IOS is not supported!"
+#elif TARGET_OS_MAC == 1
+#define TGF_MACOS
+#error "MacOS is not supported!"
+#else
+#error "Unknown Apple platform!"
+#endif
+// We also have to check __ANDROID__ before __linux__
+// since android is based on the linux kernel
+// it has __linux__ defined */
+#elif defined(__ANDROID__)
+#define TGF_ANDROID
+#error "Android is not supported!"
+#elif defined(__linux__)
+#define TGF_LINUX 
+#error "Linux is not supported!"
+#else
+#error "Unknown platform!"
 #endif
 
-// Language detection.
 #if defined(__cplusplus)
-    #define TGF_CPP
+#define TGF_CPP
 #else
-    #define TGF_C
+#define TGF_C
 #endif
 
 // ============================================
@@ -86,148 +80,139 @@
 #include <string.h>
 
 #ifdef TGF_WINDOWS 
-    //#define WIN32_LEAN_AND_MEAN //@Note: Removed because timeBeginPeriod
-    // Win32 API and Unicode proc versions.
-    #define UNICODE
-    #define _UNICODE
-    #include <Windows.h>
+#define UNICODE
+#define _UNICODE
+#include <Windows.h>
 #endif
 
 #ifdef TGF_OPENGL
-    #include "GL/GL.h"
+#include "GL/GL.h"
 #endif
 
 // ============================================
 // @: Numeric Types.
 // ============================================
 
-typedef uint8_t  U8;
-typedef uint16_t U16;
-typedef uint32_t U32;
-typedef uint64_t U64;
-typedef int8_t   S8;
-typedef int16_t  S16;
-typedef int32_t  S32;
-typedef int64_t  S64;
-typedef S8       B8;
-typedef S16      B16;
-typedef S32      B32;
-typedef S64      B64;
-typedef float    F32;
-typedef double   F64;
-
-typedef U32      U32Enum;
-typedef S32      S32Size;
-
-// ============================================
-// @: Bool.
-// ============================================
-
-#ifdef TGF_C
-
-// Just in case lets undef some true and false.
-#undef true
-#undef false
-
-#define true  ((B8) 1)
-#define false ((B8) 0)
-
-#endif
-
-// ============================================
-// @: Units.
-// ============================================
-
-#define KB(n)  (((U64)(n)) << 10)
-#define MB(n)  (((U64)(n)) << 20)
-#define GB(n)  (((U64)(n)) << 30)
-#define TB(n)  (((U64)(n)) << 40)
-#define Thousand(n)   ((n)*1000)
-#define Million(n)    ((n)*1000000)
-#define Billion(n)    ((n)*1000000000)
-
-// ============================================
-// @: Clamp, Min, Max.
-// ============================================
-
-#define Min(A,B) (((A)<(B))?(A):(B))
-#define Max(A,B) (((A)>(B))?(A):(B))
-#define Clamp(A,X,B) (((X)<(A))?(A):((X)>(B))?(B):(X))
-
-// ============================================
-// @: AlignOf.
-// ============================================
-
-// @Pending(Platform): This will work just in clang and msvc.
-#define AlignOf(T) __alignof(T)
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+typedef float f32;
+typedef double f64;
+typedef s8 b8;
+typedef u32 u32_enum;
 
 // ============================================
 // @: Helper Macros.
 // ============================================
 
-#define InternalStringify(S) #S
-#define Stringify(S) InternalStringify(S)
+// Heavily used macros ---------------------------------------- 
 
-#define InternalGlue(A,B) A##B
-#define Glue(A,B) InternalGlue(A,B)
+// Custom true/false literals.
+#ifdef TGF_C
+#undef true
+#undef false
+#define true ((b8) 1)
+#define false ((b8) 0)
+#endif
 
-#define EachIndex(it, count) (S32 it = 0; it < (count); it += 1)
-#define DeferFor(begin, end) for(S32 _i_ = ((begin), 0); !_i_; _i_ += 1, (end))
-#define AlignPow2(x,b) (((x) + (b) - 1)&(~((b) - 1))) // @Note: b has to be pow2. 
+// Logging and assertions macros.
 
+// Logging/Assertion Helper functions -------
+#ifdef TGF_DEBUG
+
+void trace_function  (const char* fmt, ...);
+void check_function  (b8 expr, const char* fmt, ...);
+b8   ensure_function (b8 expr, const char* fmt, ...);
+
+#endif
+//-------------------------------------------
+
+#ifdef TGF_DEBUG
+#define trace(X, ...) (trace_function(X, ##__VA_ARGS__))
+#else
+#define trace(X, ...)
+#endif
+
+#ifdef TGF_DEBUG
+#define check(X) check_function((X), "Check failed: %s\n", #X)
+#define check_msg(X, ...) check_function((X), __VA_ARGS__)
+#define ensure(X) ensure_function((X), "Ensure failed: %s\n", #X)
+#define ensure_msg(X, ...) ensure_function((X), __VA_ARGS__)
+#else
+#define check(X) ((void)0)
+#define check_msg(...) ((void)0)
+#define ensure(X) (X)
+#define ensure_msg(X, ...) (X)
+#endif
+
+// Loop helpers.
+#define each_index(it, count) (s32 it = 0; it < (count); it += 1)
+
+// Cross-language zero struct literal.
 #if defined(TGF_CPP)
-  #define ZeroStruct
+#define nil {}
 #elif defined(TGF_C)
-  #define ZeroStruct 0
+#define nil {0}
 #endif
 
+// Cross-language struct intializer/designated initializer list helper.
 #if defined(TGF_CPP)
-  #define MakeStruct(T, ...) { __VA_ARGS__ }
+#define make_struct(T, ...) { __VA_ARGS__ }
+#define make_union(T, ...) { __VA_ARGS__ }
 #elif defined(TGF_C)
-  #define MakeStruct(T, ...) (T){ __VA_ARGS__ }
+#define make_struct(T, ...) (struct T){ __VA_ARGS__ }
+#define make_union(T, ...) (union T){ __VA_ARGS__ }
 #endif
 
-#define UnusedVar(v) ((void)v)
+// ----------------------------------------------------------
 
-// ============================================
-// @: Log and Assert/Check.
-// ============================================
-
+// Static assert.
 #ifdef TGF_DEBUG
-void internal_log(const char* fmt, ...);
-void internal_check(B8 expr, const char* fmt, ...);
-B8   internal_ensure(B8 expr, const char* fmt, ...);
-#endif
-
-#ifdef TGF_DEBUG
-    #define Log(X, ...) (internal_log(X, ##__VA_ARGS__))
+#define STATIC_CHECK(C, ID) static u8 GLUE(ID, __LINE__)[(C)?1:-1] // @Review: Maybe we shouldn't get rid of this one, ever.
 #else
-    #define Log(X, ...)
+#define STATIC_CHECK(C, ID)
 #endif
 
-#ifdef TGF_DEBUG
-    #ifdef TGF_WINDOWS
-        #define StopAtThisLine() __debugbreak()
-    #else
-        /* @Pending(Platform): This just works on Windows. */
-        #define StopAtThisLine()
-#endif
-#else
-    #define StopAtThisLine()
-#endif
+// Units.
+#define KB(n) (((u64)(n)) << 10)
+#define MB(n) (((u64)(n)) << 20)
+#define GB(n) (((u64)(n)) << 30)
+#define TB(n) (((u64)(n)) << 40)
+#define THOUSAND(n) ((n)*1000)
+#define MILLION(n) ((n)*1000000)
+#define BILLION(n) ((n)*1000000000)
 
+// ALIGN_OF, MIN, MAX, CLAMP.
+#define ALIGN_OF(T) __alignof(T) // @Pending(Platform): This will work just in clang and msvc.
+#define MIN(A,B) (((A)<(B))?(A):(B))
+#define MAX(A,B) (((A)>(B))?(A):(B))
+#define CLAMP(A,X,B) (((X)<(A))?(A):((X)>(B))?(B):(X))
+
+// Macro expansion helpers.
+#define STRINGIFY_NO_EXPAND(S) #S
+#define STRINGIFY(S) STRINGIFY_NO_EXPAND(S)
+#define GLUE_NO_EXPAND(A,B) A##B
+#define GLUE(A,B) GLUE_NO_EXPAND(A,B)
+
+// Misc.
+#define UNUSED(v) ((void)v)
+#define DEFER_BLOCK(begin, end) for(s32 _i_ = ((begin), 0); !_i_; _i_ += 1, (end))
+#define ALIGN_POW2(x,b) (((x) + (b) - 1)&(~((b) - 1))) // @Note: b has to be pow2. 
+
+// Debug break.
 #ifdef TGF_DEBUG
-    #define Check(X) internal_check((X), "Check failed: %s\n", #X)
-    #define CheckMsg(X, ...) internal_check((X), __VA_ARGS__)
-    #define StaticCheck(C, ID) static U8 Glue(ID, __LINE__)[(C)?1:-1] // @Review: Maybe we shouldn't get rid of this one, ever.
-    #define Ensure(X) internal_ensure((X), "Ensure failed: %s\n", #X)
-    #define EnsureMsg(X, ...) internal_ensure((X), __VA_ARGS__)
+#ifdef TGF_WINDOWS
+#define STOP_AT_THIS_LINE() __debugbreak()
 #else
-    #define Check(X) ((void)0)
-    #define CheckMsg(...) ((void)0)
-    #define StaticCheck(C, ID)
-    #define Ensure(X) (X)
-    #define EnsureMsg(X, ...) (X)
+#define STOP_AT_THIS_LINE()
+#endif
+#else
+#define STOP_AT_THIS_LINE()
 #endif
 
 // ============================================
@@ -236,40 +221,22 @@ B8   internal_ensure(B8 expr, const char* fmt, ...);
 
 // @Pending(Platform): All the OS code it is just windows for now.
 
-typedef struct OS_System_Info OS_System_Info;
-struct OS_System_Info
+struct system_info 
 {
-  U64 page_size;
-  U64 large_page_size;
-  U64 allocation_granularity;
+  u64 page_size;
+  u64 large_page_size;
+  u64 allocation_granularity;
 };
 
-OS_System_Info system_info = {ZeroStruct};
+extern struct system_info g_system_info;
+struct system_info* get_system_info();
 
-#ifdef TGF_WINDOWS
-
-OS_System_Info* 
-os_get_system_info();
-
-void* 
-os_reserve_large(U64 size);
-
-B32 
-os_commit_large(void *ptr, U64 size);
-
-void*
-os_reserve(U64 size);
-
-B32
-os_commit(void *ptr, U64 size);
-
-void
-os_decommit(void *ptr, U64 size);
-
-void
-os_release(void *ptr, U64 size);
-
-#endif
+void* reserve_large (u64 size);
+b8    commit_large  (void* ptr, u64 size);
+void* reserve       (u64 size);
+b8    commit        (void* ptr, u64 size);
+void  decommit      (void* ptr, u64 size);
+void  release       (void* ptr, u64 size);
 
 // ============================================
 // @: Arena.
@@ -277,206 +244,154 @@ os_release(void *ptr, U64 size);
 
 #define ARENA_HEADER_SIZE 128
 #define ARENA_FREE_LIST 1
+#define ARENA_FLAG_NO_CHAIN (1<<0)
+#define ARENA_FLAG_LARGE_PAGES (1<<1)
 
-typedef U64 Arena_Flags;
-enum
+struct arena_params 
 {
-  ArenaFlag_NoChain    = (1<<0),
-  ArenaFlag_LargePages = (1<<1),
-};
-
-typedef struct Arena_Params Arena_Params;
-struct Arena_Params
-{
-  Arena_Flags flags;
-  U64 reserve_size;
-  U64 commit_size;
-  void *optional_backing_buffer;
-  const char *allocation_site_file;
-  S32 allocation_site_line;
-};
-
-typedef struct Arena Arena;
-struct Arena
-{
-  Arena *prev;    // previous arena in chain
-  Arena *current; // current arena in chain
-  Arena_Flags flags;
-  U64 cmt_size;
-  U64 res_size;
-  U64 base_pos;
-  U64 pos;
-  U64 cmt;
-  U64 res;
+  u32_enum flags;
+  u64 reserve_size;
+  u64 commit_size;
+  void* optional_backing_buffer;
   const char* allocation_site_file;
-  S32 allocation_site_line;
+  s32 allocation_site_line;
+};
+
+#define DEFAULT_ARENA_PARAMS make_struct(arena_params, \
+  .flags                   = 0,                        \
+  .reserve_size            = MB(64),                   \
+  .commit_size             = KB(64),                   \
+  .optional_backing_buffer = NULL,                     \
+  .allocation_site_file    = __FILE__,                 \
+  .allocation_site_line    = __LINE__                  \
+)                                                      \
+
+struct arena 
+{
+  struct arena* prev;    // Previous arena in chain.
+  struct arena* current; // Current arena in chain.
+  u32_enum flags;
+  u64 cmt_size;
+  u64 res_size;
+  u64 base_pos;
+  u64 pos;
+  u64 cmt;
+  u64 res;
+  const char* allocation_site_file;
+  s32 allocation_site_line;
+
 #if ARENA_FREE_LIST
-  Arena *free_last;
+    struct arena* free_last;
 #endif
 };
 
-StaticCheck(sizeof(Arena) <= ARENA_HEADER_SIZE, arena_header_size_check);
+STATIC_CHECK(sizeof(struct arena) <= ARENA_HEADER_SIZE, arena_header_size_check);
 
-typedef struct Temp Temp;
-struct Temp
+struct temp
 {
-  Arena *arena;
-  U64 pos;
+  struct arena* arena;
+  u64 pos;
 };
 
-////////////////////////////////
-//~ rjf: Arena Functions
-
-Arena_Flags arena_default_flags = 0;
-U64 arena_default_reserve_size = MB(64);
-U64 arena_default_commit_size  = KB(64);
-
-// @Note: arena creation/destruction
-#define Arena_Params_Default MakeStruct(Arena_Params,    \
-  .flags                   = arena_default_flags,        \
-  .reserve_size            = arena_default_reserve_size, \
-  .commit_size             = arena_default_commit_size,  \
-  .optional_backing_buffer = NULL,                       \
-  .allocation_site_file    = __FILE__,                   \
-  .allocation_site_line    = __LINE__                    \
-)                                                        \
-
-Arena* 
-arena_alloc(Arena_Params *params);
-
-Arena* 
-arena_alloc_default();
-
-void
-arena_release(Arena *arena);
-
-// @Note: Arena push/pop/pos/begin core functions.
-void*
-arena_push(Arena *arena, U64 size, U64 align, B32 zero);
-
-U64
-arena_pos(Arena *arena);
-
-void  
-arena_pop_to(Arena *arena, U64 pos);
-
-void* 
-arena_begin_raw(Arena* arena, U64 align);
-
-// @Note: Arena push/pop helpers.
-void 
-arena_clear(Arena *arena);
-
-void 
-arena_pop(Arena *arena, U64 amt);
-
-// @Note: Temporary arena scopes.
-Temp
-temp_begin(Arena *arena);
-
-void 
-temp_end(Temp temp);
+struct arena*   arena_alloc_default   ();
+struct arena*   arena_alloc           (struct arena_params* params);
+void            arena_release         (struct arena* arena);
+void*           arena_push            (struct arena* arena, u64 size, u64 align, b8 zero);
+u64             arena_pos             (struct arena* arena);
+void            arena_pop_to          (struct arena* arena, u64 pos);
+void*           arena_begin_raw       (struct arena* arena, u64 align);
+void            arena_clear           (struct arena* arena);
+void            arena_pop             (struct arena* arena, u64 amt);
+struct temp     temp_begin            (struct arena* arena);
+void            temp_end              (struct temp temp);
 
 // @Note: Push helper macros.
-#define arena_push_array_no_zero_aligned(a, T, c, align) \
-  (T *) arena_push((a), sizeof(T)*(c), (align), (0))     \
-
-#define arena_push_array_aligned(a, T, c, align)     \
-  (T *) arena_push((a), sizeof(T)*(c), (align), (1)) \
-
-#define arena_push_array_no_zero(a, T, c)                       \
-  arena_push_array_no_zero_aligned(a, T, c, Max(8, AlignOf(T))) \
-
-#define arena_push_array(a, T, c)                       \
-  arena_push_array_aligned(a, T, c, Max(8, AlignOf(T))) \
-
-#define arena_push_element(a, T) (T *)        \
-  arena_push((a), sizeof(T), AlignOf(T), (1)) \
-
-#define arena_begin(a, T) (T *)    \
-  arena_begin_raw((a), AlignOf(T)) \
+#define arena_push_array_no_zero_aligned(a, T, c, align) (T*) arena_push((a), sizeof(T)*(c), (align), (0))    
+#define arena_push_array_aligned(a, T, c, align)  (T*) arena_push((a), sizeof(T)*(c), (align), (1))
+#define arena_push_array_no_zero(a, T, c) arena_push_array_no_zero_aligned(a, T, c, MAX(8, ALIGN_OF(T)))
+#define arena_push_array(a, T, c) arena_push_array_aligned(a, T, c, MAX(8, ALIGN_OF(T)))
+#define arena_push_element(a, T) (T*) arena_push((a), sizeof(T), ALIGN_OF(T), (1))
+#define arena_begin(a, T) (T*) arena_begin_raw((a), ALIGN_OF(T))
 
 // ============================================
 // @: Vec2.
 // ============================================
 
-typedef union Vec2
+union vec2
 {
   struct
   {
-    F32 x;
-    F32 y;
+    f32 x;
+    f32 y;
   };
 
-  F32 v[2];
-} 
-Vec2;
+  f32 v[2];
+};
 
 // ============================================
 // @: Vec3.
 // ============================================
 
-typedef union Vec3
+union vec3
 {
   struct
   {
-    F32 x;
-    F32 y;
-    F32 z;
+    f32 x;
+    f32 y;
+    f32 z;
   };
 
   struct
   {
-    Vec2 xy;
-    F32 _z;
+    union vec2 xy;
+    f32 _z;
   };
 
   struct
   {
-    F32 _x;
-    Vec2 yz;
+    f32 _x;
+    union vec2 yz;
   };
     
-  F32 v[3];
-}
-Vec3;
+  f32 v[3];
+};
 
 // ============================================
 // @: Vec4.
 // ============================================
 
-typedef union Vec4
+union vec4
 {
   struct
   {
-    F32 x;
-    F32 y;
-    F32 z;
-    F32 w;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 w;
   };
     
   struct
   {
-    Vec2 xy;
-    Vec2 zw;
+    union vec2 xy;
+    union vec2 zw;
   };
     
   struct
   {
-    Vec3 xyz;
-    F32 _w;
+    union vec3 xyz;
+    f32 _w;
   };
     
   struct
   {
-    F32 _x;
-    Vec3 yzw;
+    f32 _x;
+    union vec3 yzw;
   };
 
-  F32 v[4];
-} Vec4;
+  f32 v[4];
+};
 
-#define vec4(_x, _y, _z, _w) MakeStruct(Vec4, .x = _x, .y = _y, .z = _z, .w = _w)
+#define vec4_lit(_x, _y, _z, _w) make_union(vec4, .x = _x, .y = _y, .z = _z, .w = _w)
 
 // ============================================
 // @: Mat4.
@@ -484,34 +399,34 @@ typedef union Vec4
 
 typedef struct Mat4
 {
-    // @Note: Row major matrix. First number is the row, Second is the column. (D3D11)
-    F32 _11, _12, _13, _14;
-    F32 _21, _22, _23, _24;
-    F32 _31, _32, _33, _34;
-    F32 _41, _42, _43, _44;
+  // @Note: Row major matrix. First number is the row, Second is the column. (D3D11)
+  f32 _11, _12, _13, _14;
+  f32 _21, _22, _23, _24;
+  f32 _31, _32, _33, _34;
+  f32 _41, _42, _43, _44;
 } Mat4;
 
 // ============================================
 // @: Colors. (Vec4)
 // ============================================
 
-#define Vec4_White            vec4(1.000f, 1.000f, 1.000f, 1.000f)
-#define Vec4_White_Faded      vec4(1.000f, 1.000f, 1.000f, 0.000f)
-#define Vec4_Black            vec4(0.000f, 0.000f, 0.000f, 1.000f)
-#define Vec4_Corn_Flower_Blue vec4(0.388f, 0.584f, 0.933f, 1.000f)
-#define Vec4_Blue             vec4(0.000f, 0.000f, 1.000f, 1.000f)
-#define Vec4_Light_Blue       vec4(0.300f, 0.300f, 1.000f, 1.000f)
-#define Vec4_Cyan             vec4(0.000f, 1.000f, 1.000f, 1.000f)
-#define Vec4_Gray             vec4(0.500f, 0.500f, 0.500f, 1.000f)
-#define Vec4_Dark_Gray        vec4(0.200f, 0.200f, 0.200f, 1.000f)
-#define Vec4_Green            vec4(0.000f, 1.000f, 0.000f, 1.000f)
-#define Vec4_Light_Green      vec4(0.300f, 1.000f, 0.300f, 1.000f)
-#define Vec4_Chill_Green      vec4(0.047f, 0.651f, 0.408f, 1.000f)
-#define Vec4_Magenta          vec4(1.000f, 0.000f, 1.000f, 1.000f)
-#define Vec4_Red              vec4(1.000f, 0.000f, 0.000f, 1.000f)
-#define Vec4_Light_Red        vec4(1.000f, 0.300f, 0.300f, 1.000f)
-#define Vec4_Yellow           vec4(1.000f, 0.920f, 0.016f, 1.000f)
-#define Vec4_Orange           vec4(0.970f, 0.600f, 0.110f, 1.000f)
+#define COLOR_WHITE            vec4_lit(1.000f, 1.000f, 1.000f, 1.000f)
+#define COLOR_WHITE_FADED      vec4_lit(1.000f, 1.000f, 1.000f, 0.000f)
+#define COLOR_BLACK            vec4_lit(0.000f, 0.000f, 0.000f, 1.000f)
+#define COLOR_CORN_FLOWER_BLUE vec4_lit(0.388f, 0.584f, 0.933f, 1.000f)
+#define COLOR_BLUE             vec4_lit(0.000f, 0.000f, 1.000f, 1.000f)
+#define COLOR_LIGHT_BLUE       vec4_lit(0.300f, 0.300f, 1.000f, 1.000f)
+#define COLOR_CYAN             vec4_lit(0.000f, 1.000f, 1.000f, 1.000f)
+#define COLOR_GRAY             vec4_lit(0.500f, 0.500f, 0.500f, 1.000f)
+#define COLOR_DARK_GRAY        vec4_lit(0.200f, 0.200f, 0.200f, 1.000f)
+#define COLOR_GREEN            vec4_lit(0.000f, 1.000f, 0.000f, 1.000f)
+#define COLOR_LIGHT_GREEN      vec4_lit(0.300f, 1.000f, 0.300f, 1.000f)
+#define COLOR_CHILL_GREEN      vec4_lit(0.047f, 0.651f, 0.408f, 1.000f)
+#define COLOR_MAGENTA          vec4_lit(1.000f, 0.000f, 1.000f, 1.000f)
+#define COLOR_RED              vec4_lit(1.000f, 0.000f, 0.000f, 1.000f)
+#define COLOR_LIGHT_RED        vec4_lit(1.000f, 0.300f, 0.300f, 1.000f)
+#define COLOR_YELLOW           vec4_lit(1.000f, 0.920f, 0.016f, 1.000f)
+#define COLOR_ORANGE           vec4_lit(0.970f, 0.600f, 0.110f, 1.000f)
 
 
 // ============================================
@@ -520,73 +435,65 @@ typedef struct Mat4
 
 #define MAX_WINDOWS 30
 
-typedef struct Window Window;
-struct Window 
+struct window 
 {
   void* handle; // Handle to the platform-specific window. (Maybe we should change this later)
-  U32 index;    // The index occupied in the window array.
+  u32 index;    // The index occupied in the window array.
 };
 
-typedef struct Window_Params Window_Params;
-struct Window_Params
+struct window_params
 {
-  S32 width;
-  S32 height;
+  s32 width;
+  s32 height;
   const char* title;
-  Vec4 bg_color;
+  union vec4 bg_color;
 };
 
-Window_Params Window_Params_Default = MakeStruct(Window_Params,
-  .width    = 1920,
-  .height   = 1080,
-  .title    = "Application",
-  .bg_color = Vec4_Corn_Flower_Blue,
-);
+#define DEFAULT_WINDOW_PARAMS make_struct(window_params, \
+  .width    = 1920,                                      \
+  .height   = 1080,                                      \
+  .title    = "Application",                             \
+  .bg_color = COLOR_CORN_FLOWER_BLUE,                    \
+);                                                       \
 
-Window* 
-window_create(Window_Params* params);
-
-Window* 
-window_create_default();
-
-void 
-window_destroy(Window* window);
+struct window* create_window_default();
+struct window* create_window(struct window_params* params);
+void destroy_window(struct window* window);
 
 #ifdef TGF_OPENGL
-
-void
-window_swap_buffers(Window* window, B8 vsync);
-
+void swap_buffers(struct window* window, b8 vsync);
 #endif
 
 // ============================================
 // @: Input.
 // ============================================
 
-typedef enum Cursor_Mode
+enum cursor_mode
 {
-    Cursor_Mode_Default
-  , Cursor_Mode_Confined
-  , Cursor_Mode_Hidden
-} 
-Cursor_Mode;
+  CURSOR_MODE_DEFAULT,
+  CURSOR_MODE_CONFINED,
+  CURSOR_MODE_HIDDEN
+};
+
+void set_cursor_mode(enum cursor_mode mode);
 
 // @Note: Common use case.
 // 
-// Key_State_Pressed  -> Key_State_Start | Key_State_Down
-// Key_State_Repeat   -> Key_State_Down
-// Key_State_Released -> Key_State_End
+// Key_State_Pressed  -> KEY_STATE_START | KEY_STATE_DOWN
+// Key_State_Repeat   -> KEY_STATE_DOWN
+// Key_State_Released -> KEY_STATE_END
 
-typedef enum Key_State
+enum key_state
 {
-    Key_State_None  = 1 << 0
-  , Key_State_Down  = 1 << 1
-  , Key_State_Start = 1 << 2 
-  , Key_State_End   = 1 << 3
-} 
-Key_State;
+    KEY_STATE_NONE  = 1 << 0
+  , KEY_STATE_DOWN  = 1 << 1
+  , KEY_STATE_START = 1 << 2 
+  , KEY_STATE_END   = 1 << 3
+};
 
-typedef enum Key
+typedef u32 Key;
+
+enum
 {
   Key_Unknown = 0
     
@@ -638,8 +545,7 @@ typedef enum Key
 
   // *** End ***
   , Key_Count
-} 
-Key;
+};
 
 typedef enum Input_Event_Kind 
 {
@@ -657,46 +563,32 @@ typedef struct Input_Event
   Input_Event_Kind kind;
 
   Key key;
-  U32 key_state;
-  S32 wheel_delta;
+  u32 key_state;
+  s32 wheel_delta;
 
-  S32 window_x;
-  S32 window_y;
+  s32 window_x;
+  s32 window_y;
 
-  S32 mouse_x;
-  S32 mouse_y;
+  s32 mouse_x;
+  s32 mouse_y;
 
-  S32 mouse_delta_x;
-  S32 mouse_delta_y;
+  s32 mouse_delta_x;
+  s32 mouse_delta_y;
 } 
 Input_Event;
 
 typedef struct Input_Event_View
 {
   Input_Event* data;
-  S32 len;
+  s32 len;
 } 
 Input_Event_View;
 
-// @Note: Input state
+void poll_events();
 
-Arena*      input_events_arena              = NULL;
-S32         input_events_len                = 0;
-Key_State   input_key_states[Key_Count]     = {ZeroStruct};
-B32         input_key_down_table[Key_Count] = {ZeroStruct};
-Cursor_Mode input_cursor_mode               = Cursor_Mode_Default;
+Input_Event_View events_this_frame();
 
-void
-input_poll_events();
-
-void
-input_set_cursor_mode(Cursor_Mode mode);
-
-Input_Event_View 
-input_events_this_frame();
-
-B32 
-input_key_down(Key key);
+b8 is_key_down(Key key);
 
 // ============================================
 // @: OpenGL Functions.
@@ -705,21 +597,19 @@ input_key_down(Key key);
 #ifdef TGF_OPENGL
 
 // Utility function types.
-typedef void (*GLDebugProc)(U32Enum source, U32Enum type, U32 id, U32Enum severity, S32Size length, const char* message, const void* userParam);
+typedef void (*GLDebugProc)(u32_enum source, u32_enum type, u32 id, u32_enum severity, s32 length, const char* message, const void* userParam);
 
 // X Macro declaration for defining the OpenGL function prototypes.
-#define ForOpenGLFunctions(Do)                                                        \
-  Do( glDebugMessageCallback , void , (GLDebugProc callback, const void* userParam) ) \
-  Do( glCreateShader         , U32  , (U32Enum source                             ) ) \
+#define FOR_OPEN_GL_FUNCTIONS(_DO)                                                 \
+  _DO(glDebugMessageCallback, void, (GLDebugProc callback, const void* userParam)) \
+  _DO(glCreateShader, u32, (u32_enum source))                                      \
 
 // Use X macro to generate the function pointer declarations.
-#define DoFunctionDeclarations(name, ret, params) \
-  extern ret (*name) params;                      \
+#define DO_FUNCTION_DECLARATIONS(_NAME, _RETURN, _PARAMS) extern _RETURN (*_NAME) _PARAMS; 
 
-ForOpenGLFunctions(DoFunctionDeclarations)
+FOR_OPEN_GL_FUNCTIONS(DO_FUNCTION_DECLARATIONS)
 
-#undef DoFunctionDeclarations 
-
+#undef DO_FUNCTION_DECLARATIONS 
 #endif
 
 // ============================================
@@ -727,10 +617,7 @@ ForOpenGLFunctions(DoFunctionDeclarations)
 // ============================================
 
 #ifdef TGF_OPENGL
-
-B8
-gl_context_create(Window* window);
-
+b8 gl_context_create(struct window*  window);
 #endif
 
 // ============================================
@@ -739,13 +626,13 @@ gl_context_create(Window* window);
 
 #if defined(TGF_OPENGL) && defined(TGF_WINDOWS)
 
-typedef BOOL  (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC)    (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
-typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
-typedef BOOL  (WINAPI * PFNWGLSWAPINTERVALEXTPROC)         (int interval);
+typedef BOOL (WINAPI *PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
+typedef HGLRC (WINAPI *PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
+typedef BOOL (WINAPI *PFNWGLSWAPINTERVALEXTPROC) (int interval);
 
-extern PFNWGLCHOOSEPIXELFORMATARBPROC    wglChoosePixelFormatARB;
+extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
-extern PFNWGLSWAPINTERVALEXTPROC         wglSwapIntervalEXT;
+extern PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
 typedef struct GL_Win32_Context GL_Win32_Context;
 struct GL_Win32_Context 
@@ -759,7 +646,7 @@ struct GL_Win32_Context
 // So creating a context just means occuping the same slot
 // as the window.
 
-extern GL_Win32_Context gl_context_array_win32[MAX_WINDOWS];
+extern GL_Win32_Context g_wgl_context_array[MAX_WINDOWS];
 
 #endif // defined(TGF_OPENGL) && defined(TGF_WINDOWS)
 
@@ -767,8 +654,7 @@ extern GL_Win32_Context gl_context_array_win32[MAX_WINDOWS];
 // @: Graphics.
 // ============================================
 
-void
-gpu_clear(Vec4 color);
+void clear_screen(union vec4 color);
 
 #endif // TINY_GAME_FRAMEWORK_H
 
@@ -777,13 +663,12 @@ gpu_clear(Vec4 color);
 #ifdef TGF_IMPL
 
 // ============================================
-// @i: Log and Assert/Check.
+// @i: Log and Assert macros.
 // ============================================
 
 #ifdef TGF_DEBUG
 
-void 
-internal_log(const char* fmt, ...) 
+void trace_function(const char* fmt, ...) 
 {
   va_list args;
   va_start(args, fmt);
@@ -792,8 +677,7 @@ internal_log(const char* fmt, ...)
   printf("\n");
 }
 
-void 
-internal_check(B8 expr, const char* fmt, ...) 
+void check_function(b8 expr, const char* fmt, ...) 
 {
   if (expr == false) 
   {
@@ -802,12 +686,11 @@ internal_check(B8 expr, const char* fmt, ...)
     vprintf(fmt, args);
     va_end(args);
     printf("\n");
-    StopAtThisLine();
+    STOP_AT_THIS_LINE();
   }
 }
 
-B8 
-internal_ensure(B8 expr, const char* fmt, ...) 
+b8 ensure_function(b8 expr, const char* fmt, ...) 
 {
   if (expr == false) 
   {
@@ -816,7 +699,7 @@ internal_ensure(B8 expr, const char* fmt, ...)
     vprintf(fmt, args);
     va_end(args);
     printf("\n");
-    StopAtThisLine();
+    STOP_AT_THIS_LINE();
   }
   return expr != 0;
 }
@@ -827,65 +710,59 @@ internal_ensure(B8 expr, const char* fmt, ...)
 // @i: OS.
 // ============================================
 
+struct system_info g_system_info;
+
 #ifdef TGF_WINDOWS
 
-OS_System_Info* 
-os_get_system_info()
+struct system_info* get_system_info()
 {
-  if (system_info.page_size == 0)
+  if (g_system_info.page_size == 0)
   {  
-    SYSTEM_INFO sysinfo = {ZeroStruct};
+    SYSTEM_INFO sysinfo = nil;
     GetSystemInfo(&sysinfo);
     // @Pending: This we don't need this for now.
-    // system_info.logical_processor_count = (U64)sysinfo.dwNumberOfProcessors;
-    system_info.page_size               = sysinfo.dwPageSize;
-    system_info.large_page_size         = GetLargePageMinimum();
-    system_info.allocation_granularity  = sysinfo.dwAllocationGranularity;
+    // g_system_info.logical_processor_count = (u64)sysinfo.dwNumberOfProcessors;
+    g_system_info.page_size = sysinfo.dwPageSize;
+    g_system_info.large_page_size = GetLargePageMinimum();
+    g_system_info.allocation_granularity = sysinfo.dwAllocationGranularity;
   }    
-  Check(system_info.page_size != 0);
-  return &system_info;
+  check(g_system_info.page_size != 0);
+  return &g_system_info;
 }
 
-void* 
-os_reserve_large(U64 size)
+void* reserve_large(u64 size)
 {
-  // rjf: we commit on reserve because windows.
-  // @Note: I trust.
+  // We commit on reserve because windows. I trust.
   return VirtualAlloc(0, size, MEM_RESERVE|MEM_COMMIT|MEM_LARGE_PAGES, PAGE_READWRITE);
 }
 
-B32 
-os_commit_large(void *ptr, U64 size) 
+b8 commit_large(void* ptr, u64 size) 
 {
-  UnusedVar(ptr);
-  UnusedVar(size);
+  UNUSED(ptr);
+  UNUSED(size);
   return 1; 
 }
 
-void* 
-os_reserve(U64 size)
+void* reserve(u64 size)
 {
-  UnusedVar(size);
+  UNUSED(size);
   return VirtualAlloc(0, size, MEM_RESERVE, PAGE_READWRITE);
 }
 
-B32 
-os_commit(void *ptr, U64 size)
+b8 commit(void* ptr, u64 size)
 {
   return VirtualAlloc(ptr, size, MEM_COMMIT, PAGE_READWRITE) != 0;
 }
 
-void 
-os_decommit(void *ptr, U64 size)
+void decommit(void* ptr, u64 size)
 {
   VirtualFree(ptr, size, MEM_DECOMMIT);
 }
 
-void 
-os_release(void *ptr, U64 size)
+void release(void* ptr, u64 size)
 {
   // NOTE(rjf): size not used - not necessary on Windows, but necessary for other OSes.
-  UnusedVar(size);
+  UNUSED(size);
   VirtualFree(ptr, 0, MEM_RELEASE);
 }
 
@@ -895,46 +772,45 @@ os_release(void *ptr, U64 size)
 // @i: Arena.
 // ============================================
 
-Arena* 
-arena_alloc(Arena_Params* params)
+struct arena* arena_alloc(struct arena_params* params)
 {
-  // rjf: round up reserve/commit sizes
-  U64 reserve_size = params->reserve_size;
-  U64 commit_size = params->commit_size;
-  if(params->flags & ArenaFlag_LargePages)
+  // Round up reserve/commit sizes.
+  u64 reserve_size = params->reserve_size;
+  u64 commit_size = params->commit_size;
+  if(params->flags & ARENA_FLAG_LARGE_PAGES)
   {
-    reserve_size = AlignPow2(reserve_size, os_get_system_info()->large_page_size);
-    commit_size  = AlignPow2(commit_size,  os_get_system_info()->large_page_size);
+    reserve_size = ALIGN_POW2(reserve_size, get_system_info()->large_page_size);
+    commit_size  = ALIGN_POW2(commit_size,  get_system_info()->large_page_size);
   }
   else
   {
-    reserve_size = AlignPow2(reserve_size, os_get_system_info()->page_size);
-    commit_size  = AlignPow2(commit_size,  os_get_system_info()->page_size);
+    reserve_size = ALIGN_POW2(reserve_size, get_system_info()->page_size);
+    commit_size  = ALIGN_POW2(commit_size,  get_system_info()->page_size);
   }
   
-  // rjf: reserve/commit initial block
-  void *base = params->optional_backing_buffer;
+  // Reserve/commit initial block.
+  void* base = params->optional_backing_buffer;
   if(base == 0)
   {
-    if(params->flags & ArenaFlag_LargePages)
+    if(params->flags & ARENA_FLAG_LARGE_PAGES)
     {
-      base = os_reserve_large(reserve_size);
-      os_commit_large(base, commit_size);
+      base = reserve_large(reserve_size);
+      commit_large(base, commit_size);
     }
     else
     {
-      base = os_reserve(reserve_size);
-      os_commit(base, commit_size);
+      base = reserve(reserve_size);
+      commit(base, commit_size);
     }
     
     // @Pending: Keep track of allocations like raddebugger does.
     //raddbg_annotate_vaddr_range(base, reserve_size, "arena %s:%i", params->allocation_site_file, params->allocation_site_line);
   }
   
-  CheckMsg(base != 0, "Unexpected memory allocation failure.");
+  check_msg(base != 0, "Unexpected memory allocation failure.");
   
-  // rjf: extract arena header & fill
-  Arena *arena = (Arena *)base;
+  // Extract arena header & fill.
+  struct arena* arena = (struct arena*) base;
   arena->current = arena;
   arena->flags = params->flags;
   arena->cmt_size = params->commit_size;
@@ -954,43 +830,42 @@ arena_alloc(Arena_Params* params)
   return arena;
 }
 
-Arena* arena_alloc_default()
+struct arena* arena_alloc_default()
 {
-  Arena_Params params = Arena_Params_Default;
+  struct arena_params params = DEFAULT_ARENA_PARAMS;
   return arena_alloc(&params);
 }
 
-void arena_release(Arena *arena)
+void arena_release(struct arena* arena)
 {
-  for(Arena *n = arena->current, *prev = 0; n != 0; n = prev)
+  for(struct arena* n = arena->current, *prev = 0; n != 0; n = prev)
   {
     prev = n->prev;
-    os_release(n, n->res);
+    release(n, n->res);
   }
 }
 
 // @Note: arena push/pop core functions
 
-void* 
-arena_push(Arena *arena, U64 size, U64 align, B32 zero)
+void* arena_push(struct arena* arena, u64 size, u64 align, b8 zero)
 {
-  Arena *current = arena->current;
-  U64 pos_pre = AlignPow2(current->pos, align);
-  U64 pos_pst = pos_pre + size;
+  struct arena* current = arena->current;
+  u64 ppre = ALIGN_POW2(current->pos, align);
+  u64 ppst = ppre + size;
   
-  // rjf: chain, if needed
-  if(current->res < pos_pst && !(arena->flags & ArenaFlag_NoChain))
+  // Chain, if needed.
+  if(current->res < ppst && !(arena->flags & ARENA_FLAG_NO_CHAIN))
   {
-    Arena *new_block = 0;
+    struct arena* new_block = 0;
     
 #if ARENA_FREE_LIST
     {
-      Arena *prev_block;
-      for(new_block = arena->free_last, prev_block = 0; new_block != 0; prev_block = new_block, new_block = new_block->prev)
+      struct arena* prev_block;
+      for (new_block = arena->free_last, prev_block = 0; new_block != 0; prev_block = new_block, new_block = new_block->prev)
       {
-        if(new_block->res >= AlignPow2(new_block->pos, align) + size)
+        if (new_block->res >= ALIGN_POW2(new_block->pos, align) + size)
         {
-          if(prev_block)
+          if (prev_block)
           {
             prev_block->prev = new_block->prev;
           }
@@ -1004,16 +879,17 @@ arena_push(Arena *arena, U64 size, U64 align, B32 zero)
     }
 #endif
     
-    if(new_block == 0)
+    if (new_block == 0)
     {
-      U64 res_size = current->res_size;
-      U64 cmt_size = current->cmt_size;
-      if(size + ARENA_HEADER_SIZE > res_size)
+      u64 res_size = current->res_size;
+      u64 cmt_size = current->cmt_size;
+
+      if (size + ARENA_HEADER_SIZE > res_size)
       {
-        res_size = AlignPow2(size + ARENA_HEADER_SIZE, align);
-        cmt_size = AlignPow2(size + ARENA_HEADER_SIZE, align);
+        res_size = ALIGN_POW2(size + ARENA_HEADER_SIZE, align);
+        cmt_size = ALIGN_POW2(size + ARENA_HEADER_SIZE, align);
       }
-      Arena_Params params = Arena_Params_Default;
+      struct arena_params params = DEFAULT_ARENA_PARAMS;
       params.reserve_size = res_size;
       params.commit_size = cmt_size;
       params.flags = current->flags;
@@ -1026,135 +902,129 @@ arena_push(Arena *arena, U64 size, U64 align, B32 zero)
     new_block->prev = arena->current, arena->current = new_block;
     
     current = new_block;
-    pos_pre = AlignPow2(current->pos, align);
-    pos_pst = pos_pre + size;
+    ppre = ALIGN_POW2(current->pos, align);
+    ppst = ppre + size;
   }
   
-  // rjf: compute the size we need to zero
-  U64 size_to_zero = 0;
-  if(zero)
+  // Compute the size we need to zero.
+  u64 size_to_zero = 0;
+  if (zero)
   {
-    size_to_zero = Min(current->cmt, pos_pst) - pos_pre;
+    size_to_zero = MIN(current->cmt, ppst) - ppre;
   }
   
-  // rjf: commit new pages, if needed
-  if(current->cmt < pos_pst)
+  // Commit new pages, if needed.
+  if (current->cmt < ppst)
   {
-    U64 cmt_pst_aligned = pos_pst + current->cmt_size-1;
-    cmt_pst_aligned -= cmt_pst_aligned%current->cmt_size;
-    U64 cmt_pst_clamped = Min(cmt_pst_aligned, current->res);
-    U64 cmt_size = cmt_pst_clamped - current->cmt;
-    U8 *cmt_ptr = (U8 *)current + current->cmt;
-    if(current->flags & ArenaFlag_LargePages)
+    u64 cmt_pst_aligned = ppst + current->cmt_size - 1;
+    cmt_pst_aligned -= cmt_pst_aligned % current->cmt_size;
+    u64 cmt_pst_clamped = MIN(cmt_pst_aligned, current->res);
+    u64 cmt_size = cmt_pst_clamped - current->cmt;
+    u8 *cmt_ptr = (u8*) current + current->cmt;
+
+    if (current->flags & ARENA_FLAG_LARGE_PAGES)
     {
-      os_commit_large(cmt_ptr, cmt_size);
+      commit_large(cmt_ptr, cmt_size);
     }
     else
     {
-      os_commit(cmt_ptr, cmt_size);
+      commit(cmt_ptr, cmt_size);
     }
     current->cmt = cmt_pst_clamped;
   }
   
-  // rjf: push onto current block
-  void *result = 0;
-  if(current->cmt >= pos_pst)
+  // Push onto current block.
+  void* result = 0;
+  if (current->cmt >= ppst)
   {
-    result = (U8 *)current+pos_pre;
-    current->pos = pos_pst;
+    result = (u8 *)current+ppre;
+    current->pos = ppst;
 
     // @Pending: Use adress sanitizer like raddebugger does.
     //AsanUnpoisonMemoryRegion(result, size);
-    if(size_to_zero != 0)
+    if (size_to_zero != 0)
     {
       memset(result, 0, size_to_zero);
     }
   }
   
-  CheckMsg(result != 0, "Unexpected memory allocation failure.");
+  check_msg(result != 0, "Unexpected memory allocation failure.");
   return result;
 }
 
-U64 
-arena_pos(Arena *arena)
+u64 arena_pos(struct arena* arena)
 {
-  Arena *current = arena->current;
-  U64 pos = current->base_pos + current->pos;
+  struct arena *current = arena->current;
+  u64 pos = current->base_pos + current->pos;
   return pos;
 }
 
-void 
-arena_pop_to(Arena *arena, U64 pos)
+void arena_pop_to(struct arena* arena, u64 pos)
 {
-  U64 big_pos = Max(ARENA_HEADER_SIZE, pos);
-  Arena *current = arena->current;
+  u64 big_pos = MAX(ARENA_HEADER_SIZE, pos);
+  struct arena *current = arena->current;
   
 #if ARENA_FREE_LIST
-  for(Arena* prev = NULL; current->base_pos >= big_pos; current = prev)
+  for (struct arena* prev = NULL; current->base_pos >= big_pos; current = prev)
   {
     prev = current->prev;
     current->pos = ARENA_HEADER_SIZE;
     current->prev = arena->free_last, arena->free_last = current;
 
     // @Pending: Use adress sanitizer like raddebugger does.
-    //AsanPoisonMemoryRegion((U8*)current + ARENA_HEADER_SIZE, current->res - ARENA_HEADER_SIZE);
+    //AsanPoisonMemoryRegion((u8*)current + ARENA_HEADER_SIZE, current->res - ARENA_HEADER_SIZE);
   }
 #else
-  for(Arena* prev = 0; current->base_pos >= big_pos; current = prev)
+  for (struct arena* prev = 0; current->base_pos >= big_pos; current = prev)
   {
     prev = current->prev;
-    os_release(current, current->res);
+    release(current, current->res);
   }
 #endif
   arena->current = current;
-  U64 new_pos = big_pos - current->base_pos;
-  Check(new_pos <= current->pos);
+  u64 new_pos = big_pos - current->base_pos;
+  check(new_pos <= current->pos);
 
   // @Pending: Use adress sanitizer like raddebugger does.
-  // AsanPoisonMemoryRegion((U8*)current + new_pos, (current->pos - new_pos));
+  // AsanPoisonMemoryRegion((u8*)current + new_pos, (current->pos - new_pos));
   current->pos = new_pos;
 }
 
-void*
-arena_begin_raw(Arena* arena, U64 align)
+void* arena_begin_raw(struct arena* arena, u64 align)
 {
-  U64 raw_start = (U64) ((U8*) arena) + ARENA_HEADER_SIZE;
-  U64 start = AlignPow2(raw_start, align);
+  u64 raw_start = (u64) ((u8*) arena) + ARENA_HEADER_SIZE;
+  u64 start = ALIGN_POW2(raw_start, align);
   return (void*) start;
 }
 
 // @Note: arena push/pop helpers
 
-void 
-arena_clear(Arena *arena)
+void arena_clear(struct arena* arena)
 {
   arena_pop_to(arena, 0);
 }
 
-void 
-arena_pop(Arena *arena, U64 amt)
+void arena_pop(struct arena* arena, u64 amt)
 {
-  U64 pos_old = arena_pos(arena);
-  U64 pos_new = pos_old;
-  if(amt < pos_old)
+  u64 pold = arena_pos(arena);
+  u64 pnew = pold;
+  if(amt < pold)
   {
-    pos_new = pos_old - amt;
+    pnew = pold - amt;
   }
-  arena_pop_to(arena, pos_new);
+  arena_pop_to(arena, pnew);
 }
 
 // @Note: temporary arena scopes
 
-Temp 
-temp_begin(Arena *arena)
+struct temp temp_begin(struct arena* arena)
 {
-  U64 pos = arena_pos(arena);
-  Temp temp = {arena, pos};
+  u64 pos = arena_pos(arena);
+  struct temp temp = {arena, pos};
   return temp;
 }
 
-void 
-temp_end(Temp temp)
+void temp_end(struct temp temp)
 {
   arena_pop_to(temp.arena, temp.pos);
 }
@@ -1163,10 +1033,70 @@ temp_end(Temp temp)
 // @i: Input
 // ============================================
 
+static enum cursor_mode g_cursor_mode = CURSOR_MODE_DEFAULT;
+static struct arena* g_input_events_arena = NULL;
+static s32 g_input_events_len = 0;
+static b8 g_key_down_table[Key_Count] = nil;
+
 #ifdef TGF_WINDOWS
 
-Key 
-internal_input_key_from_vk_win32(WPARAM wParam)
+static void update_cursor() 
+{
+  if (g_cursor_mode == CURSOR_MODE_DEFAULT)
+  return;
+
+  HWND fg = GetForegroundWindow();
+  
+  RECT rect;
+  GetClientRect(fg, &rect);
+  
+  POINT ul = { rect.left,  rect.top };
+  POINT lr = { rect.right, rect.bottom };
+
+  ClientToScreen(fg, &ul);
+  ClientToScreen(fg, &lr);
+
+  rect.left = ul.x;
+  rect.top = ul.y;
+  rect.right = lr.x;
+  rect.bottom = lr.y;
+  
+  ClipCursor(&rect);
+  
+  if (g_cursor_mode == CURSOR_MODE_HIDDEN)
+  {
+    // @Note: We center the cursor.
+    SetCursorPos
+    (
+        (rect.left + rect.right)  / 2,
+        (rect.top  + rect.bottom) / 2
+    );
+  }
+}
+
+void set_cursor_mode(enum cursor_mode mode)
+{
+  if (mode == g_cursor_mode)
+  {
+    return;
+  }
+
+  if (mode == CURSOR_MODE_DEFAULT)
+  {
+    ClipCursor(NULL);
+
+    // @Robustness: This won't work on multiple windows in different threads.
+    while (ShowCursor(TRUE) < 0) {}
+  }
+  else
+  {
+    // @Robustness: This won't work on multiple windows in different threads.
+    while (ShowCursor(FALSE) >= 0) {}
+  }
+  g_cursor_mode = mode;
+}
+
+static Key key_from_vk(WPARAM wParam)
 {
   // *** ASCII KEYS ***
   if (wParam >= '0' && wParam <= '9')
@@ -1221,43 +1151,7 @@ internal_input_key_from_vk_win32(WPARAM wParam)
   return Key_Unknown;
 }
 
-void 
-internal_input_update_cursor_state_win32() 
-{
-  if (input_cursor_mode == Cursor_Mode_Default)
-  return;
-
-  HWND fg = GetForegroundWindow();
-  
-  RECT rect;
-  GetClientRect(fg, &rect);
-  
-  POINT ul = { rect.left,  rect.top };
-  POINT lr = { rect.right, rect.bottom };
-
-  ClientToScreen(fg, & ul);
-  ClientToScreen(fg, &lr);
-
-  rect.left = ul.x;
-  rect.top = ul.y;
-  rect.right = lr.x;
-  rect.bottom = lr.y;
-  
-  ClipCursor(&rect);
-  
-  if (input_cursor_mode == Cursor_Mode_Hidden)
-  {
-    // @Note: We center the cursor.
-    SetCursorPos
-    (
-        (rect.left + rect.right) / 2,
-        (rect.top + rect.bottom) / 2
-    );
-  }
-}
-
-CALLBACK LRESULT 
-internal_input_process_events_win32(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   // @Pending:
   //if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
@@ -1282,147 +1176,146 @@ internal_input_process_events_win32(HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
         LONG dx = raw->data.mouse.lLastX;
         LONG dy = raw->data.mouse.lLastY;
         
-        Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-        input_events_len += 1;
+        Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+        g_input_events_len += 1;
         ev->kind = Input_Event_Kind_Mouse_Move;
         
         ev->mouse_delta_x = dx;
         ev->mouse_delta_y = dy;
 
-        ev->mouse_x = (S32)(short)LOWORD(lParam);
-        ev->mouse_y = (S32)(short)HIWORD(lParam);
+        ev->mouse_x = (s32)(short)LOWORD(lParam);
+        ev->mouse_y = (s32)(short)HIWORD(lParam);
       }
       break;
     }
     case WM_SIZE: 
     {
-      Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-      input_events_len += 1;
+      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Window;
       ev->window_x = LOWORD(lParam);
       ev->window_y = HIWORD(lParam);
-      internal_input_update_cursor_state_win32();
+      update_cursor();
     }
     break;
 
     case WM_MOVE: 
     {
-        internal_input_update_cursor_state_win32();
+      update_cursor();
     }
     break;
 
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN: 
     {
-      Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-      input_events_len += 1;
+      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Key;
-      ev->key = internal_input_key_from_vk_win32(wParam);
+      ev->key = key_from_vk(wParam);
 
-      ev->key_state = Key_State_Down;
+      ev->key_state = KEY_STATE_DOWN;
 
-      B32 is_repeat = (lParam & (1 << 30)) != 0;
+      b8 is_repeat = (lParam & (1 << 30)) != 0;
 
       if (!is_repeat)
       {
-          ev->key_state |= Key_State_Start;
+        ev->key_state |= KEY_STATE_START;
       }
 
-      input_key_down_table[ev->key] = 1;
+      g_key_down_table[ev->key] = 1;
     }
     break;
 
     case WM_KEYUP:
     case WM_SYSKEYUP: 
     {
-      Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-      input_events_len += 1;
+      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Key;
-      ev->key = internal_input_key_from_vk_win32(wParam);
+      ev->key = key_from_vk(wParam);
 
-      ev->key_state = Key_State_End;
+      ev->key_state = KEY_STATE_END;
 
-      input_key_down_table[ev->key] = 1;
+      g_key_down_table[ev->key] = 1;
     }
     break;
 
     case WM_MOUSEMOVE: 
     {
-        internal_input_update_cursor_state_win32();
+        update_cursor();
     }
     break;
     case WM_LBUTTONDOWN:
     case WM_LBUTTONUP: 
     {
-      Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-      input_events_len += 1;
+      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Key;
       ev->key = Key_Mouse_Left;
       
-      B32 down = msg == WM_LBUTTONDOWN;
-      ev->key_state = down ? Key_State_Down : Key_State_End;
-      input_key_down_table[ev->key] = down;
+      b8 down = msg == WM_LBUTTONDOWN;
+      ev->key_state = down ? KEY_STATE_DOWN : KEY_STATE_END;
+      g_key_down_table[ev->key] = down;
     }
     break;
 
     case WM_RBUTTONDOWN:
     case WM_RBUTTONUP: 
     {
-      Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-      input_events_len += 1;
+      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Key;
       ev->key = Key_Mouse_Right;
       
-      B32 down = msg == WM_RBUTTONDOWN;
-      ev->key_state = down ? Key_State_Down : Key_State_End;
-      input_key_down_table[ev->key] = down;
+      b8 down = msg == WM_RBUTTONDOWN;
+      ev->key_state = down ? KEY_STATE_DOWN : KEY_STATE_END;
+      g_key_down_table[ev->key] = down;
     }
     break;
 
     case WM_MBUTTONDOWN:
     case WM_MBUTTONUP: 
     {
-      Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-      input_events_len += 1;
+      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Key;
       ev->key = Key_Mouse_Middle;
       
-      B32 down = msg == WM_MBUTTONDOWN;
-      ev->key_state = down ? Key_State_Down : Key_State_End;
-      input_key_down_table[ev->key] = down;
+      b8 down = msg == WM_MBUTTONDOWN;
+      ev->key_state = down ? KEY_STATE_DOWN : KEY_STATE_END;
+      g_key_down_table[ev->key] = down;
     }
     break;
 
     case WM_MOUSEWHEEL: 
     {
-      Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-      input_events_len += 1;
+      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Mouse_Wheel;
-      ev->wheel_delta = (S32)GET_WHEEL_DELTA_WPARAM(wParam);
+      ev->wheel_delta = (s32)GET_WHEEL_DELTA_WPARAM(wParam);
     }
     break;
 
     case WM_CLOSE:
     case WM_QUIT: 
     {
-      Input_Event* ev = arena_push_element(input_events_arena, Input_Event);
-      input_events_len += 1;
+      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Quit;
     }
     break;
     case WM_KILLFOCUS:
-      memset(input_key_down_table, 0, sizeof(input_key_down_table));
+      memset(g_key_down_table, 0, sizeof(g_key_down_table));
     break;
   }
 
   return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-void
-input_poll_events()
+void poll_events()
 {
-  arena_clear(input_events_arena);
-  input_events_len = 0;
+  arena_clear(g_input_events_arena);
+  g_input_events_len = 0;
 
   MSG msg = {};
   while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -1432,72 +1325,43 @@ input_poll_events()
   }
 }
 
-void
-input_set_cursor_mode(Cursor_Mode mode)
-{
-  if (mode == input_cursor_mode)
-  {
-    return;
-  }
-
-  if (mode == Cursor_Mode_Default)
-  {
-    ClipCursor(NULL);
-
-    // @Robustness: This won't work on multiple windows in different threads.
-    while (ShowCursor(TRUE) < 0) {}
-  }
-  else
-  {
-    // @Robustness: This won't work on multiple windows in different threads.
-    while (ShowCursor(FALSE) >= 0) {}
-  }
-  input_cursor_mode = mode;
-}
-
-Input_Event_View 
-input_events_this_frame()
+Input_Event_View events_this_frame()
 {
   Input_Event_View view;
-  view.data = arena_begin(input_events_arena, Input_Event);
-  view.len  = input_events_len;
+  view.data = arena_begin(g_input_events_arena, Input_Event);
+  view.len  = g_input_events_len;
   return view;
 }
 
-B32 
-input_key_down(Key key)
+b8 is_key_down(Key key)
 {
-  return input_key_down_table[key];
+  return g_key_down_table[key];
 }
 
 // ============================================
 // @i: Window.
 // ============================================
 
-#define WindowClassNameWin32 L"Window Class"
+#define WIN32_CLASS_NAME L"Window Class"
+#define WIN32_STYLE_WINDOWED    WS_OVERLAPPEDWINDOW
+#define WIN32_STYLE_FULLSCREEN  WS_VISIBLE | WS_POPUP
+#define WIN32_STYLE_SECONDARY   WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 
-#define WindowStyleWindowedWin32    WS_OVERLAPPEDWINDOW
-#define WindowStyleFullscreenWin32  WS_VISIBLE | WS_POPUP
-#define WindowStyleSecondaryWin32   WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+#define WIN32_STYLE_DEFAULT WIN32_STYLE_WINDOWED 
 
-#define WindowStyleDefaultWin32 WindowStyleWindowedWin32
-
-typedef struct Window_Array Window_Array;
-struct Window_Array
+struct
 {
-  Window data[MAX_WINDOWS];
-  U32 len;
-};
+  struct window data[MAX_WINDOWS];
+  u32 len;
+} 
+static g_window_array;
+static b8 g_win32_class_registered = false;
+static b8 g_win32_input_device_registered = false;
+static HWND g_win32_main_window = NULL;
 
-Window_Array window_array;
-B8 window_class_registered_win32 = 0;
-B8 input_device_registered_win32 = 0;
-HWND main_window_win32 = NULL;
-
-B8
-internal_window_class_create_once_win32(Window_Params* params)
+static b8 create_win32_class_once(struct window_params* params)
 {
-  if (window_class_registered_win32 == 0)
+  if (g_win32_class_registered == false)
   {
     SetProcessDPIAware();
     // @Note:
@@ -1523,8 +1387,8 @@ internal_window_class_create_once_win32(Window_Params* params)
     // @Robustness: This does not work on dlls.
     HINSTANCE hInstance = GetModuleHandle(0);
 
-    WNDCLASSEXW wc = {ZeroStruct};
-    wc.lpfnWndProc = &internal_input_process_events_win32;
+    WNDCLASSEXW wc = nil;
+    wc.lpfnWndProc = &process_events;
 
     // @Note Use this to run the default event processing.
     //wc.lpfnWndProc = &DefWindowProc;
@@ -1534,24 +1398,23 @@ internal_window_class_create_once_win32(Window_Params* params)
     wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);   // Default icon.
     wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION); // Small icon.
     wc.hInstance = hInstance;
-    wc.lpszClassName = WindowClassNameWin32;
+    wc.lpszClassName = WIN32_CLASS_NAME;
     // @Note: CreateSolidBrush changes the background color, I guess.
     wc.hbrBackground = CreateSolidBrush(RGB(params->bg_color.x * 255, params->bg_color.y * 255, params->bg_color.z * 255));
-    window_class_registered_win32 = RegisterClassExW(&wc) != 0;
+    g_win32_class_registered = RegisterClassExW(&wc) != 0;
 
-    if (!EnsureMsg(window_class_registered_win32 != 0, "Error! Couldn't register the Win32 window class."))
+    if (!ensure_msg(g_win32_class_registered != false, "Error! Couldn't register the Win32 window class."))
     {
         return false;
     }
 
-    Log("Win32 Window class registered!");
+    trace("Win32 struct window class registered!");
     return true;
   }
   return false;
 }
 
-HWND 
-internal_window_create_win32(Window_Params* params)
+static HWND create_win32_window(struct window_params* params)
 {
   // Calculate the RECT -----------
   RECT rect;
@@ -1560,36 +1423,36 @@ internal_window_create_win32(Window_Params* params)
   rect.right = params->width;
   rect.bottom = params->height;
 
-  AdjustWindowRect(&rect, WindowStyleDefaultWin32, 0);
+  AdjustWindowRect(&rect, WIN32_STYLE_DEFAULT, 0);
 
-  S32 client_width = rect.right - rect.left;
-  S32 client_height = rect.bottom - rect.top;
+  s32 client_width = rect.right - rect.left;
+  s32 client_height = rect.bottom - rect.top;
 
   // Convert title to wchar_t* -----------
-  #define MaxTitleLen 256u
-  wchar_t title_buffer[MaxTitleLen + 1];
+  #define MAX_TITLE_LEN 256u
+  wchar_t title_buffer[MAX_TITLE_LEN + 1];
   {
-    U64 title_len = strlen(params->title);
-    if (!EnsureMsg(title_len <= MaxTitleLen, "Error! The title len is %llu chars. Max is %llu.", title_len, MaxTitleLen))
+    u64 title_len = strlen(params->title);
+    if (!ensure_msg(title_len <= MAX_TITLE_LEN, "Error! The title len is %llu chars. MAX is %llu.", title_len, MAX_TITLE_LEN))
     {
       return NULL;
     }
 
-    S32 len = MultiByteToWideChar
+    s32 len = MultiByteToWideChar
     (
       CP_UTF8,
       0,                 // flags.
       params->title,     // input.
       -1,                // (-1 = null-terminated).
       title_buffer,      // output buffer.
-      MaxTitleLen + 1    // buffer len.
+      MAX_TITLE_LEN + 1    // buffer len.
     );
 
     if (len == 0) 
     {
       DWORD err = GetLastError();
-      Log("Error! %lu\n", err);
-      StopAtThisLine();
+      trace("Error! %lu\n", err);
+      STOP_AT_THIS_LINE();
       return NULL;
     }
   }
@@ -1600,9 +1463,9 @@ internal_window_create_win32(Window_Params* params)
   HWND hwnd = CreateWindowExW
   (
     0,                          // Optional window styles.
-    WindowClassNameWin32,       // Window class.
-    title_buffer,               // Window title
-    WindowStyleDefaultWin32,    // Window style.
+    WIN32_CLASS_NAME,       // struct window class.
+    title_buffer,               // struct window title
+    WIN32_STYLE_DEFAULT,    // struct window style.
     CW_USEDEFAULT,              // X Pos.
     CW_USEDEFAULT,              // Y Pos.
     client_width,               // Width.
@@ -1616,10 +1479,9 @@ internal_window_create_win32(Window_Params* params)
   return hwnd;
 }
 
-B8
-internal_window_input_device_create_once_win32(HWND hwnd)
+b8 create_win32_input_device_once(HWND hwnd)
 {
-  if (input_device_registered_win32 == 0)
+  if (g_win32_input_device_registered == false)
   {
     // @Note: Register the input device.
     RAWINPUTDEVICE rid;
@@ -1627,34 +1489,32 @@ internal_window_input_device_create_once_win32(HWND hwnd)
     rid.usUsage = 0x02;     // Mouse
     rid.dwFlags = RIDEV_INPUTSINK;
     rid.hwndTarget = hwnd;
-    input_device_registered_win32 = (B8) RegisterRawInputDevices(&rid, 1, sizeof(rid));
+    g_win32_input_device_registered = (b8) RegisterRawInputDevices(&rid, 1, sizeof(rid));
     
     return true;
   }
   return false;
 }
 
-Window* 
-window_create_default()
+struct window* create_window_default()
 {
-  Window_Params params = Window_Params_Default;
-  return window_create(&params);
+  struct window_params params = DEFAULT_WINDOW_PARAMS;
+  return create_window(&params);
 }
 
-Window* 
-window_create(Window_Params* params)
+struct window* create_window(struct window_params* params)
 {
-  if (!EnsureMsg(window_array.len < MAX_WINDOWS, "Window limit reached!"))
+  if (!ensure_msg(g_window_array.len < MAX_WINDOWS, "struct window limit reached!"))
   {
     return NULL;
   }
 
   // Get the window slot.
-  Window* window = NULL;
+  struct window* window = NULL;
 
-  for EachIndex(it, MAX_WINDOWS)
+  for each_index(it, MAX_WINDOWS)
   {
-    Window* curr = &window_array.data[it];
+    struct window*  curr = &g_window_array.data[it];
     if (curr->handle == NULL)
     {
       window = curr;
@@ -1662,51 +1522,51 @@ window_create(Window_Params* params)
     }
   }
   
-  if (!EnsureMsg(window != NULL, "Unexpected window alloc error!"))
+  if (!ensure_msg(window != NULL, "Unexpected window alloc error!"))
   {
     return NULL;
   }
 
   // Create the window class once.
-  B8 created = internal_window_class_create_once_win32(params);
+  b8 created = create_win32_class_once(params);
 
   // If the window class is created we zero all the window array memory just in case.
   if (created)
   {
-    memset(&window_array, 0, sizeof(Window_Array));
+    memset(&g_window_array, 0, sizeof(g_window_array));
   }
 
   // Create Windows window.
-  HWND hwnd = internal_window_create_win32(params);
+  HWND hwnd = create_win32_window(params);
 
-  if (!EnsureMsg(hwnd != 0, "Error! Couldn't create the Win32 window."))
+  if (!ensure_msg(hwnd != 0, "Error! Couldn't create the Win32 window."))
   {
     return NULL;
   }
 
-  Log("Win32 Window created!");
+  trace("Win32 struct window created!");
   
   // Create the window input device once.
-  created = internal_window_input_device_create_once_win32(hwnd);
+  created = create_win32_input_device_once(hwnd);
   
   // If the input device is created setup the input event arena .
   if (created)
   {
-    Check(input_events_arena == NULL);
-    Arena_Params params = Arena_Params_Default;
-    params.flags &= ArenaFlag_NoChain;
-    input_events_arena = arena_alloc_default();
+    check(g_input_events_arena == NULL);
+    struct arena_params params = DEFAULT_ARENA_PARAMS;
+    params.flags &= ARENA_FLAG_NO_CHAIN;
+    g_input_events_arena = arena_alloc_default();
   }
 
   // Fill the window slot.
   window->handle = hwnd;
-  window->index  = window_array.len;
-  window_array.len += 1;
+  window->index  = g_window_array.len;
+  g_window_array.len += 1;
 
 #ifdef TGF_OPENGL
   // @Review: Create the opengl context.
-  B8 success = gl_context_create(window);
-  UnusedVar(success);
+  b8 success = gl_context_create(window);
+  UNUSED(success);
 #endif
   
   // Show the window.
@@ -1717,18 +1577,17 @@ window_create(Window_Params* params)
   return window;
 }
 
-void 
-window_destroy(Window* window)
+void destroy_window(struct window*  window)
 {
-  if (!EnsureMsg((window_array.len > 0 && window->handle != NULL), "Not a valid window!"))
+  if (!ensure_msg((g_window_array.len > 0 && window->handle != NULL), "Not a valid window!"))
   {
     return;
   }
 
-  B8 found = false;
-  for EachIndex(it, MAX_WINDOWS)
+  b8 found = false;
+  for each_index(it, MAX_WINDOWS)
   {
-    Window* curr = &window_array.data[it];
+    struct window*  curr = &g_window_array.data[it];
     if (curr == window)
     {
         found = true;
@@ -1736,7 +1595,7 @@ window_destroy(Window* window)
     }
   }
 
-  if (!EnsureMsg(found, "Window not found!"))
+  if (!ensure_msg(found, "struct window not found!"))
   {
     return;
   }
@@ -1744,11 +1603,11 @@ window_destroy(Window* window)
   HWND hwnd = (HWND) window->handle;
 
   DestroyWindow(hwnd);
-  Log("Win32 Window destroyed!");
+  trace("Win32 struct window destroyed!");
 
-  if (hwnd == main_window_win32)
+  if (hwnd == g_win32_main_window)
   {
-    if (input_device_registered_win32)
+    if (g_win32_input_device_registered)
     {
       RAWINPUTDEVICE rid;
       rid.usUsagePage = 0x01; // Generic Desktop
@@ -1756,27 +1615,26 @@ window_destroy(Window* window)
       rid.dwFlags = RIDEV_REMOVE;
       rid.hwndTarget = hwnd;
       RegisterRawInputDevices(&rid, 1, sizeof(rid));
-      input_device_registered_win32 = 0;
-      Check(input_events_arena != NULL);
-      arena_clear(input_events_arena);
+      g_win32_input_device_registered = false;
+      check(g_input_events_arena != NULL);
+      arena_clear(g_input_events_arena);
     }
-    // @Pending: Free the window class and set window_class_registered_win32 to false.
-    main_window_win32 = NULL;
+    // @Pending: Free the window class and set g_win32_class_registered to false.
+    g_win32_main_window = NULL;
   }
 
-  memset(window, 0, sizeof(Window));
-  window_array.len -= 1;
+  memset(window, 0, sizeof(struct window));
+  g_window_array.len -= 1;
 }
 
 #ifdef TGF_OPENGL
 
-void
-window_swap_buffers(Window* window, B8 vsync)
+void swap_buffers(struct window*  window, b8 vsync)
 {
   wglSwapIntervalEXT(vsync ? 1 : 0);
-  Check(window->handle != NULL);
-  GL_Win32_Context* context = &gl_context_array_win32[window->index];
-  Check(context->device != NULL);
+  check(window->handle != NULL);
+  GL_Win32_Context* context = &g_wgl_context_array[window->index];
+  check(context->device != NULL);
   SwapBuffers(context->device);
 }
 
@@ -1791,12 +1649,11 @@ window_swap_buffers(Window* window, B8 vsync)
 #ifdef TGF_OPENGL
 
 // Use X macro to generate the function pointers definitions.
-#define DoFunctionPointerDefinitions(name, ret, params)    \
-  ret (*name) params = NULL;                               \
+#define DO_FUNCTION_POINTER_DEFINITIONS(_NAME, _RETURN, _PARAMS) _RETURN (*_NAME) _PARAMS = NULL;                               \
 
-ForOpenGLFunctions(DoFunctionPointerDefinitions)
+FOR_OPEN_GL_FUNCTIONS(DO_FUNCTION_POINTER_DEFINITIONS)
 
-#undef DoFunctionPointerDefinitions 
+#undef DO_FUNCTION_POINTER_DEFINITIONS 
 
 #endif // TGF_OPENGL
 
@@ -1806,17 +1663,17 @@ ForOpenGLFunctions(DoFunctionPointerDefinitions)
 
 #if defined(TGF_OPENGL) && defined(TGF_WINDOWS)
 
-GL_Win32_Context gl_context_array_win32[MAX_WINDOWS] = {ZeroStruct};
+GL_Win32_Context g_wgl_context_array[MAX_WINDOWS] = nil;
 
 // @Note: Windows sucks.
 
-PFNWGLCHOOSEPIXELFORMATARBPROC    wglChoosePixelFormatARB    = NULL;
+PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = NULL;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = NULL;
-PFNWGLSWAPINTERVALEXTPROC         wglSwapIntervalEXT         = NULL;
+PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
+
 HMODULE ogl = NULL;
 
-void*
-internal_gl_resolve_function(const char* name)
+static void* resolve_gl_proc(const char* name)
 {
 	void* p = (void*) wglGetProcAddress(name);
 
@@ -1837,20 +1694,17 @@ internal_gl_resolve_function(const char* name)
 	return p;
 }
 
-void
-internal_gl_resolve_functions_win32()
+static void resolve_gl_procs()
 {
    // Use X macro to generate the function pointer assignments.
-   #define DoFunctionResolve(name, ret, params) \
-     name = ( ret(*) params ) internal_gl_resolve_function(#name);
+   #define DO_FUNCTION_RESOLVE(_NAME, _RETURN, _PARAMS) _NAME = ( _RETURN(*) _PARAMS ) resolve_gl_proc(#_NAME);
  
-   ForOpenGLFunctions(DoFunctionResolve)
+   FOR_OPEN_GL_FUNCTIONS(DO_FUNCTION_RESOLVE)
 
-   #undef DoFunctionResolve 
+   #undef DO_FUNCTION_RESOLVE 
 }
 
-B8
-internal_gl_resolve_wgl_functions_once_win32()
+b8 resolve_wgl_procs()
 {
   // @Note: I guess we need to resolve this functions just once.
   if (wglChoosePixelFormatARB && wglCreateContextAttribsARB && wglSwapIntervalEXT)
@@ -1859,7 +1713,7 @@ internal_gl_resolve_wgl_functions_once_win32()
   }
 
   // @Pending: Do we need to reset this pointers if the class is destroyed?
-  if (!EnsureMsg(window_class_registered_win32, "We need at least one window created at this point."))
+  if (!ensure_msg(g_win32_class_registered, "We need at least one window created at this point."))
   {
     return false;   
   }
@@ -1867,15 +1721,15 @@ internal_gl_resolve_wgl_functions_once_win32()
 	
 	// Dummy window creation.
 
-  Window_Params dummy_params = MakeStruct(Window_Params,
+  struct window_params dummy_params = make_struct(window_params,
     .width    = 0,
     .height   = 0,
     .title    = "Dummy",
-    .bg_color = Vec4_White,
+    .bg_color = nil,
   );
 
-  HWND window = internal_window_create_win32(&dummy_params);
-  Check(window != NULL);
+  HWND window = create_win32_window(&dummy_params);
+  check(window != NULL);
 
 	// @Note: HDC stands for handle to device context.
 	HDC dc = GetDC(window);
@@ -1889,7 +1743,7 @@ internal_gl_resolve_wgl_functions_once_win32()
 	ds.cDepthBits = 24;
 	ds.iLayerType = PFD_MAIN_PLANE;
 	
-	S32 pf = ChoosePixelFormat(dc, &ds);
+	s32 pf = ChoosePixelFormat(dc, &ds);
 	SetPixelFormat(dc, pf, &ds);
 	
 	// @Note: HGLRC stands for handle to OpenGL rendering context. 
@@ -1897,9 +1751,9 @@ internal_gl_resolve_wgl_functions_once_win32()
 	wglMakeCurrent(dc, context);
 	
 	// @Note: Resolve wgl extension functions.
-	wglChoosePixelFormatARB    = (PFNWGLCHOOSEPIXELFORMATARBPROC   ) (void*) (wglGetProcAddress("wglChoosePixelFormatARB"));
+	wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC) (void*) (wglGetProcAddress("wglChoosePixelFormatARB"));
 	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC) (void*) (wglGetProcAddress("wglCreateContextAttribsARB"));
-	wglSwapIntervalEXT         = (PFNWGLSWAPINTERVALEXTPROC        ) (void*) (wglGetProcAddress("wglSwapIntervalEXT"));
+	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) (void*) (wglGetProcAddress("wglSwapIntervalEXT"));
 	
 	// @Note: Destroy the old context and the dummy window.
 	wglMakeCurrent(dc, 0);
@@ -1908,37 +1762,36 @@ internal_gl_resolve_wgl_functions_once_win32()
   return true;
 }
 
-B8
-gl_context_create(Window* window)
+b8 gl_context_create(struct window* window)
 {
-  if (!EnsureMsg(window->handle != NULL, "The window must to be valid!"))
+  if (!ensure_msg(window->handle != NULL, "The window must to be valid!"))
   {
     return false;
   }
   
-  GL_Win32_Context* context = &gl_context_array_win32[window->index];
+  GL_Win32_Context* context = &g_wgl_context_array[window->index];
 
-  if (!EnsureMsg(context->handle == NULL, "This window has already an associated context!"))
+  if (!ensure_msg(context->handle == NULL, "This window has already an associated context!"))
   {
     return false;
   }
 
-  B8 result = internal_gl_resolve_wgl_functions_once_win32();
-  UnusedVar(result);
+  b8 result = resolve_wgl_procs();
+  UNUSED(result);
 
-  S32 WGL_DRAW_TO_WINDOW_ARB     = 0x2001;
-  S32 WGL_SUPPORT_OPENGL_ARB     = 0x2010;
-  S32 WGL_DOUBLE_BUFFER_ARB      = 0x2011;
-  S32 WGL_ACCELERATION_ARB       = 0x2003;
-  S32 WGL_FULL_ACCELERATION_ARB  = 0x2027;
-  S32 WGL_PIXEL_TYPE_ARB         = 0x2013;
-  S32 WGL_COLOR_BITS_ARB         = 0x2014;
-  S32 WGL_DEPTH_BITS_ARB         = 0x2022;
-  S32 WGL_STENCIL_BITS_ARB       = 0x2023;
-  S32 WGL_TYPE_RGBA_ARB          = 0x202B;
+  s32 WGL_DRAW_TO_WINDOW_ARB     = 0x2001;
+  s32 WGL_SUPPORT_OPENGL_ARB     = 0x2010;
+  s32 WGL_DOUBLE_BUFFER_ARB      = 0x2011;
+  s32 WGL_ACCELERATION_ARB       = 0x2003;
+  s32 WGL_FULL_ACCELERATION_ARB  = 0x2027;
+  s32 WGL_PIXEL_TYPE_ARB         = 0x2013;
+  s32 WGL_COLOR_BITS_ARB         = 0x2014;
+  s32 WGL_DEPTH_BITS_ARB         = 0x2022;
+  s32 WGL_STENCIL_BITS_ARB       = 0x2023;
+  s32 WGL_TYPE_RGBA_ARB          = 0x202B;
 
 	// @Note: Modern OpenGL initialization.
-	S32 pixel_forattribs[] = 
+	s32 pixel_forattribs[] = 
   {
 		WGL_DRAW_TO_WINDOW_ARB      , true,
 		WGL_SUPPORT_OPENGL_ARB      , true,
@@ -1952,8 +1805,8 @@ gl_context_create(Window* window)
 	};
 	
 	HDC dc = GetDC((HWND) window->handle);
-	S32 pixel_format = 0;
-	U32 num_formats  = 0u;
+	s32 pixel_format = 0;
+	u32 num_formats  = 0u;
 
 	wglChoosePixelFormatARB(dc, pixel_forattribs, 0, 1, &pixel_format, &num_formats);
 
@@ -1961,14 +1814,14 @@ gl_context_create(Window* window)
 	DescribePixelFormat(dc, pixel_format, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 	SetPixelFormat(dc, pixel_format, &pfd);
 
-  S32 WGL_CONTEXT_MAJOR_VERSION_ARB    = 0x2091;
-  S32 WGL_CONTEXT_MINOR_VERSION_ARB    = 0x2092;
-  S32 WGL_CONTEXT_PROFILE_MASK_ARB     = 0x9126;
-  S32 WGL_CONTEXT_CORE_PROFILE_BIT_ARB = 0x00000001;
-  S32 WGL_CONTEXT_FLAGS_ARB            = 0x2094;
-  S32 WGL_CONTEXT_DEBUG_BIT_ARB        = 0x00000001;
+  s32 WGL_CONTEXT_MAJOR_VERSION_ARB    = 0x2091;
+  s32 WGL_CONTEXT_MINOR_VERSION_ARB    = 0x2092;
+  s32 WGL_CONTEXT_PROFILE_MASK_ARB     = 0x9126;
+  s32 WGL_CONTEXT_CORE_PROFILE_BIT_ARB = 0x00000001;
+  s32 WGL_CONTEXT_FLAGS_ARB            = 0x2094;
+  s32 WGL_CONTEXT_DEBUG_BIT_ARB        = 0x00000001;
 
-	S32 context_attribs[] = 
+	s32 context_attribs[] = 
   {
 		WGL_CONTEXT_MAJOR_VERSION_ARB  , 4,
 		WGL_CONTEXT_MINOR_VERSION_ARB  , 6,
@@ -1987,9 +1840,9 @@ gl_context_create(Window* window)
 	context->handle = hglrc;
 	context->device = dc;
 	
-	internal_gl_resolve_functions_win32();
+	resolve_gl_procs();
 
-  Log("Win32 OpenGL Context created!");
+  trace("Win32 OpenGL Context created!");
   return true;
 }
 
@@ -2001,8 +1854,7 @@ gl_context_create(Window* window)
 
 #ifdef TGF_OPENGL
 
-void
-gpu_clear(Vec4 color)
+void clear_screen(union vec4 color)
 {
   glClearColor(color.x, color.y, color.z, color.w);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
