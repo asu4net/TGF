@@ -1,5 +1,5 @@
 #ifdef DEBUG
-  #define TGF_DEBUG
+#define TGF_DEBUG
 #endif
 
 #define TGF_IMPL
@@ -15,10 +15,22 @@ s32 main(s32 argc, char** argv)
   trace("This is Tiny Game Framework example!");
   struct window* window = create_window_default();
 
+  union vec4 bg_color_a = COLOR_CORN_FLOWER_BLUE;
+  union vec4 bg_color_b = COLOR_CHILL_GREEN;
+
   while (!quit)
   {
-    clear_screen(COLOR_RED);
     poll_events();
+
+    if (is_key_down('V'))
+    {
+      clear_screen(bg_color_a);
+    }
+    else
+    {
+      clear_screen(bg_color_b);
+    }
+
     Input_Event_View view = events_this_frame();
     for each_index(i, view.len)
     {
@@ -30,6 +42,7 @@ s32 main(s32 argc, char** argv)
         break;
       }
     }
+    
     swap_buffers(window, /*vsync*/ true);
   }
   destroy_window(window);

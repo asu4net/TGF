@@ -477,23 +477,18 @@ enum cursor_mode
 
 void set_cursor_mode(enum cursor_mode mode);
 
-// @Note: Common use case.
-// 
-// Key_State_Pressed  -> KEY_STATE_START | KEY_STATE_DOWN
-// Key_State_Repeat   -> KEY_STATE_DOWN
-// Key_State_Released -> KEY_STATE_END
-
 enum key_state
 {
-    KEY_STATE_NONE  = 1 << 0
-  , KEY_STATE_DOWN  = 1 << 1
-  , KEY_STATE_START = 1 << 2 
-  , KEY_STATE_END   = 1 << 3
+    KEY_STATE_NONE     = 1 << 0 
+  , KEY_STATE_DOWN     = 1 << 1
+  , KEY_STATE_START    = 1 << 2 
+  , KEY_STATE_END      = 1 << 3
+  , KEY_STATE_PRESSED  = KEY_STATE_START | KEY_STATE_DOWN
+  , KEY_STATE_REPEAT   = KEY_STATE_DOWN
+  , KEY_STATE_RELEASED = KEY_STATE_END
 };
 
-typedef u32 Key;
-
-enum
+enum key_code
 {
     KEY_UNKNOWN = 0
     
@@ -547,6 +542,8 @@ enum
   , KEY_COUNT
 };
 
+STATIC_CHECK(sizeof(enum key_code) <= sizeof(u32), key_code_size_check);
+
 typedef enum Input_Event_Kind 
 {
     Input_Event_Kind_None
@@ -562,7 +559,7 @@ typedef struct Input_Event
 {
   Input_Event_Kind kind;
 
-  Key key;
+  u32 key;
   u32 key_state;
   s32 wheel_delta;
 
@@ -588,7 +585,7 @@ void poll_events();
 
 Input_Event_View events_this_frame();
 
-b8 is_key_down(Key key);
+b8 is_key_down(u32 key);
 
 // ============================================
 // @: OpenGL Functions.
@@ -1096,17 +1093,17 @@ void set_cursor_mode(enum cursor_mode mode)
   g_cursor_mode = mode;
 }
 
-static Key key_from_vk(WPARAM wParam)
+static u32 key_from_vk(WPARAM wParam)
 {
   // *** ASCII KEYS ***
   if (wParam >= '0' && wParam <= '9')
   {
-    return (Key) wParam;
+    return (u32) wParam;
   }
 
   if (wParam >= 'A' && wParam <= 'Z')
   {
-    return (Key) wParam;
+    return (u32) wParam;
   }
 
   // *** NON ASCII ***
@@ -1137,15 +1134,15 @@ static Key key_from_vk(WPARAM wParam)
   case VK_SNAPSHOT:   return KEY_PRINT_SCREEN;
 
   // @Note: Apparently this doesn't work.
-  //case VK_LBUTTON:    return Key_Mouse_Left;
-  //case VK_MBUTTON:    return Key_Mouse_Middle;
-  //case VK_RBUTTON:    return Key_Mouse_Right;
+  //case VK_LBUTTON:    return KEY_MOUSE_LEFT;
+  //case VK_MBUTTON:    return KEY_MOUSE_MIDDLE;
+  //case VK_RBUTTON:    return KEY_MOUSE_RIGHT;
   }
   
   // *** FUNCTION KEYS ***
   if (wParam >= VK_F1 && wParam <= VK_F24)
   {
-    return (Key) (KEY_F1 + (wParam - VK_F1));
+    return (u32) (KEY_F1 + (wParam - VK_F1));
   }
 
   return KEY_UNKNOWN;
@@ -1222,7 +1219,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
         ev->key_state |= KEY_STATE_START;
       }
 
-      g_key_down_table[ev->key] = 1;
+      g_key_down_table[ev->key] = true;
     }
     break;
 
@@ -1236,7 +1233,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
       ev->key_state = KEY_STATE_END;
 
-      g_key_down_table[ev->key] = 1;
+      g_key_down_table[ev->key] = false;
     }
     break;
 
@@ -1333,7 +1330,7 @@ Input_Event_View events_this_frame()
   return view;
 }
 
-b8 is_key_down(Key key)
+b8 is_key_down(u32 key)
 {
   return g_key_down_table[key];
 }
