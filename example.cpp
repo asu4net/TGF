@@ -36,7 +36,7 @@ s32 main(s32 argc, char** argv)
     {
       Input_Event* ev = &view.data[i];
 
-      if (ev->kind == Input_Event_Kind_Quit)
+      if (ev->kind == INPUT_EVENT_QUIT)
       {
         quit = true;
         break;

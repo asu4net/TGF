@@ -299,7 +299,7 @@ void            arena_release         (struct arena* arena);
 void*           arena_push            (struct arena* arena, u64 size, u64 align, b8 zero);
 u64             arena_pos             (struct arena* arena);
 void            arena_pop_to          (struct arena* arena, u64 pos);
-void*           arena_begin_raw       (struct arena* arena, u64 align);
+void*           arena_first_raw       (struct arena* arena, u64 align);
 void            arena_clear           (struct arena* arena);
 void            arena_pop             (struct arena* arena, u64 amt);
 struct temp     temp_begin            (struct arena* arena);
@@ -311,7 +311,7 @@ void            temp_end              (struct temp temp);
 #define arena_push_array_no_zero(a, T, c) arena_push_array_no_zero_aligned(a, T, c, MAX(8, ALIGN_OF(T)))
 #define arena_push_array(a, T, c) arena_push_array_aligned(a, T, c, MAX(8, ALIGN_OF(T)))
 #define arena_push_element(a, T) (T*) arena_push((a), sizeof(T), ALIGN_OF(T), (1))
-#define arena_begin(a, T) (T*) arena_begin_raw((a), ALIGN_OF(T))
+#define arena_first(a, T) (T*) arena_first_raw((a), ALIGN_OF(T))
 
 // ============================================
 // @: Vec2.
@@ -544,20 +544,19 @@ enum key_code
 
 STATIC_CHECK(sizeof(enum key_code) <= sizeof(u32), key_code_size_check);
 
-typedef enum Input_Event_Kind 
+enum input_event_kind 
 {
-    Input_Event_Kind_None
-  , Input_Event_Kind_Key
-  , Input_Event_Kind_Window
-  , Input_Event_Kind_Mouse_Move
-  , Input_Event_Kind_Mouse_Wheel
-  , Input_Event_Kind_Quit
-} 
-Input_Event_Kind;
+    INPUT_EVENT_NONE
+  , INPUT_EVENT_KEY
+  , INPUT_EVENT_WINDOW
+  , INPUT_EVENT_MOUSE_MOVE
+  , INPUT_EVENT_MOUSE_WHEEL
+  , INPUT_EVENT_QUIT
+};
 
 typedef struct Input_Event
 {
-  Input_Event_Kind kind;
+  enum input_event_kind kind;
 
   u32 key;
   u32 key_state;
@@ -987,7 +986,7 @@ void arena_pop_to(struct arena* arena, u64 pos)
   current->pos = new_pos;
 }
 
-void* arena_begin_raw(struct arena* arena, u64 align)
+void* arena_first_raw(struct arena* arena, u64 align)
 {
   u64 raw_start = (u64) ((u8*) arena) + ARENA_HEADER_SIZE;
   u64 start = ALIGN_POW2(raw_start, align);
@@ -1175,7 +1174,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
         
         Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
         g_input_events_len += 1;
-        ev->kind = Input_Event_Kind_Mouse_Move;
+        ev->kind = INPUT_EVENT_MOUSE_MOVE;
         
         ev->mouse_delta_x = dx;
         ev->mouse_delta_y = dy;
@@ -1189,7 +1188,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
-      ev->kind = Input_Event_Kind_Window;
+      ev->kind = INPUT_EVENT_WINDOW;
       ev->window_x = LOWORD(lParam);
       ev->window_y = HIWORD(lParam);
       update_cursor();
@@ -1207,7 +1206,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
-      ev->kind = Input_Event_Kind_Key;
+      ev->kind = INPUT_EVENT_KEY;
       ev->key = key_from_vk(wParam);
 
       ev->key_state = KEY_STATE_DOWN;
@@ -1228,7 +1227,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
-      ev->kind = Input_Event_Kind_Key;
+      ev->kind = INPUT_EVENT_KEY;
       ev->key = key_from_vk(wParam);
 
       ev->key_state = KEY_STATE_END;
@@ -1247,7 +1246,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
-      ev->kind = Input_Event_Kind_Key;
+      ev->kind = INPUT_EVENT_KEY;
       ev->key = KEY_MOUSE_LEFT;
       
       b8 down = msg == WM_LBUTTONDOWN;
@@ -1261,7 +1260,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
-      ev->kind = Input_Event_Kind_Key;
+      ev->kind = INPUT_EVENT_KEY;
       ev->key = KEY_MOUSE_RIGHT;
       
       b8 down = msg == WM_RBUTTONDOWN;
@@ -1275,7 +1274,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
-      ev->kind = Input_Event_Kind_Key;
+      ev->kind = INPUT_EVENT_KEY;
       ev->key = KEY_MOUSE_MIDDLE;
       
       b8 down = msg == WM_MBUTTONDOWN;
@@ -1288,7 +1287,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
-      ev->kind = Input_Event_Kind_Mouse_Wheel;
+      ev->kind = INPUT_EVENT_MOUSE_WHEEL;
       ev->wheel_delta = (s32)GET_WHEEL_DELTA_WPARAM(wParam);
     }
     break;
@@ -1298,7 +1297,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
-      ev->kind = Input_Event_Kind_Quit;
+      ev->kind = INPUT_EVENT_QUIT;
     }
     break;
     case WM_KILLFOCUS:
@@ -1325,7 +1324,7 @@ void poll_events()
 Input_Event_View events_this_frame()
 {
   Input_Event_View view;
-  view.data = arena_begin(g_input_events_arena, Input_Event);
+  view.data = arena_first(g_input_events_arena, Input_Event);
   view.len  = g_input_events_len;
   return view;
 }
