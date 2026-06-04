@@ -554,7 +554,7 @@ enum input_event_kind
   , INPUT_EVENT_QUIT
 };
 
-typedef struct Input_Event
+struct input_event
 {
   enum input_event_kind kind;
 
@@ -570,19 +570,17 @@ typedef struct Input_Event
 
   s32 mouse_delta_x;
   s32 mouse_delta_y;
-} 
-Input_Event;
+};
 
-typedef struct Input_Event_View
+struct input_event_view
 {
-  Input_Event* data;
+  struct input_event* data;
   s32 len;
-} 
-Input_Event_View;
+};
 
 void poll_events();
 
-Input_Event_View events_this_frame();
+struct input_event_view events_this_frame();
 
 b8 is_key_down(u32 key);
 
@@ -1172,7 +1170,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
         LONG dx = raw->data.mouse.lLastX;
         LONG dy = raw->data.mouse.lLastY;
         
-        Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+        struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
         g_input_events_len += 1;
         ev->kind = INPUT_EVENT_MOUSE_MOVE;
         
@@ -1186,7 +1184,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     }
     case WM_SIZE: 
     {
-      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
       g_input_events_len += 1;
       ev->kind = INPUT_EVENT_WINDOW;
       ev->window_x = LOWORD(lParam);
@@ -1204,7 +1202,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN: 
     {
-      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
       g_input_events_len += 1;
       ev->kind = INPUT_EVENT_KEY;
       ev->key = key_from_vk(wParam);
@@ -1225,7 +1223,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     case WM_KEYUP:
     case WM_SYSKEYUP: 
     {
-      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
       g_input_events_len += 1;
       ev->kind = INPUT_EVENT_KEY;
       ev->key = key_from_vk(wParam);
@@ -1244,7 +1242,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     case WM_LBUTTONDOWN:
     case WM_LBUTTONUP: 
     {
-      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
       g_input_events_len += 1;
       ev->kind = INPUT_EVENT_KEY;
       ev->key = KEY_MOUSE_LEFT;
@@ -1258,7 +1256,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     case WM_RBUTTONDOWN:
     case WM_RBUTTONUP: 
     {
-      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
       g_input_events_len += 1;
       ev->kind = INPUT_EVENT_KEY;
       ev->key = KEY_MOUSE_RIGHT;
@@ -1272,7 +1270,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     case WM_MBUTTONDOWN:
     case WM_MBUTTONUP: 
     {
-      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
       g_input_events_len += 1;
       ev->kind = INPUT_EVENT_KEY;
       ev->key = KEY_MOUSE_MIDDLE;
@@ -1285,7 +1283,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
     case WM_MOUSEWHEEL: 
     {
-      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
       g_input_events_len += 1;
       ev->kind = INPUT_EVENT_MOUSE_WHEEL;
       ev->wheel_delta = (s32)GET_WHEEL_DELTA_WPARAM(wParam);
@@ -1295,7 +1293,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     case WM_CLOSE:
     case WM_QUIT: 
     {
-      Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
+      struct input_event* ev = arena_push_element(g_input_events_arena, struct input_event);
       g_input_events_len += 1;
       ev->kind = INPUT_EVENT_QUIT;
     }
@@ -1321,10 +1319,10 @@ void poll_events()
   }
 }
 
-Input_Event_View events_this_frame()
+struct input_event_view events_this_frame()
 {
-  Input_Event_View view;
-  view.data = arena_first(g_input_events_arena, Input_Event);
+  struct input_event_view view;
+  view.data = arena_first(g_input_events_arena, struct input_event);
   view.len  = g_input_events_len;
   return view;
 }

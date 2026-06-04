@@ -31,10 +31,10 @@ s32 main(s32 argc, char** argv)
       clear_screen(bg_color_b);
     }
 
-    Input_Event_View view = events_this_frame();
+    struct input_event_view view = events_this_frame();
     for each_index(i, view.len)
     {
-      Input_Event* ev = &view.data[i];
+      struct input_event* ev = &view.data[i];
 
       if (ev->kind == INPUT_EVENT_QUIT)
       {
