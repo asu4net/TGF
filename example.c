@@ -25,7 +25,7 @@ static void tick(f32 dt)
 
 s32 main(s32 argc, char** argv) 
 {
-  struct engine_params p = DEFAULT_ENGINE_PARAMS;
+  struct engine_params p = nil;
   p.argv = argv;
   p.argc = argc;
   p.callbacks.tick = &tick;

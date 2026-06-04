@@ -698,18 +698,16 @@ struct engine_params
   struct engine_callbacks callbacks;
 };
 
-static struct engine_params default_engine_params = make_struct(engine_params,
-  .argv = NULL,
-  .argc = 0,
-  .callbacks = make_struct(engine_callbacks,
-    .run = NULL,
-    .on_event = NULL,
-    .tick = NULL,
-    .end = NULL,
-  )
+#define DEFAULT_ENGINE_PARAMS make_struct(engine_params,  \
+  .argv = NULL,                                           \
+  .argc = 0,                                              \
+  .callbacks = make_struct(engine_callbacks,              \
+    .run = NULL,                                          \
+    .on_event = NULL,                                     \
+    .tick = NULL,                                         \
+    .end = NULL,                                          \
+  )                                                       \
 );
-
-#define DEFAULT_ENGINE_PARAMS default_engine_params
 
 struct 
 {
