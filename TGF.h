@@ -17,9 +17,10 @@
 //
 // Compile Flags:
 //
-// TGF_IMPL   Pastes the function implementations.
-// TGF_DEBUG  Enables trace, check, ensure macros.
-// TGF_OPENGL Uses OpenGL.
+// TGF_IMPL    Pastes the function implementations.
+// TGF_DEBUG   Enables trace, check, ensure macros.
+// TGF_OPENGL  Uses OpenGL.
+// TGF_CODEGEN Starts with in code-generation mode.
 
 #ifndef TINY_GAME_FRAMEWORK_H
 #define TINY_GAME_FRAMEWORK_H
@@ -241,6 +242,12 @@ b8   ensure_function (b8 expr, const char* fmt, ...);
 #endif
 
 // ============================================
+// @: Code-Gen.
+// ============================================
+
+void generate_code();
+
+// ============================================
 // @: OS.
 // ============================================
 
@@ -417,19 +424,6 @@ union vec4
 };
 
 #define vec4_lit(_x, _y, _z, _w) make_union(vec4, .x = _x, .y = _y, .z = _z, .w = _w)
-
-// ============================================
-// @: Mat4.
-// ============================================
-
-typedef struct Mat4
-{
-  // @Note: Row major matrix. First number is the row, Second is the column. (D3D11)
-  f32 _11, _12, _13, _14;
-  f32 _21, _22, _23, _24;
-  f32 _31, _32, _33, _34;
-  f32 _41, _42, _43, _44;
-} Mat4;
 
 // ============================================
 // @: Colors. (Vec4)
@@ -681,6 +675,121 @@ void clear_screen(union vec4 color);
 #ifdef TGF_IMPL
 
 // ============================================
+// @i: Entry Point.
+// ============================================
+
+typedef void(*CALLBACK_RUN)();
+typedef void(*CALLBACK_PROCESS_EVENTS)(struct input_event* event);
+typedef void(*CALLBACK_TICK)(f32 dt);
+typedef void(*CALLBACK_END)();
+
+struct engine_callbacks
+{
+  CALLBACK_RUN run;
+  CALLBACK_PROCESS_EVENTS on_event;
+  CALLBACK_TICK tick;
+  CALLBACK_END end;
+};
+
+struct engine_params
+{
+  char** argv;
+  s32 argc;
+  struct engine_callbacks callbacks;
+};
+
+static struct engine_params default_engine_params = make_struct(engine_params,
+  .argv = NULL,
+  .argc = 0,
+  .callbacks = make_struct(engine_callbacks,
+    .run = NULL,
+    .on_event = NULL,
+    .tick = NULL,
+    .end = NULL,
+  )
+);
+
+#define DEFAULT_ENGINE_PARAMS default_engine_params
+
+struct 
+{
+  b8 quit;
+  b8 vsync;
+  union vec4 clear_color;
+  struct window* window;
+  struct engine_callbacks callbacks;
+} g_engine = nil;
+
+static void engine_run(struct engine_params* params)
+{
+#ifdef TGF_CODEGEN
+  UNUSED(params);
+  generate_code();
+#else
+  // Initialization.
+  g_engine.clear_color = COLOR_CHILL_GREEN;
+  g_engine.vsync = true;
+  g_engine.window = create_window_default();
+  g_engine.callbacks = params->callbacks;
+
+  if (g_engine.callbacks.run)
+  {
+    g_engine.callbacks.run();
+  }
+
+  // Main loop.
+  while (!g_engine.quit)
+  {
+    poll_events();
+
+    struct input_event_view view = events_this_frame();
+
+    // Process events.
+    for each_index(i, view.len)
+    {
+      struct input_event* ev = &view.data[i];
+
+      if (ev->kind == INPUT_EVENT_QUIT)
+      {
+        g_engine.quit = true;
+        break;
+      }
+
+      if (ev->kind == INPUT_EVENT_KEY && ev->key == KEY_ESCAPE && ev->key_state == KEY_STATE_PRESSED)
+      {
+        g_engine.quit = true;
+        break;
+      }
+
+      if (g_engine.callbacks.on_event != NULL)
+      {
+        g_engine.callbacks.on_event(ev);
+      }
+    }
+
+    // Draw frame.
+    clear_screen(g_engine.clear_color);
+
+    if (g_engine.callbacks.tick != NULL)
+    {
+      g_engine.callbacks.tick(0);
+    }
+    
+    // Present.
+    swap_buffers(g_engine.window, g_engine.vsync);
+  }
+
+  // Finish.
+  if (g_engine.callbacks.end != NULL)
+  {
+    g_engine.callbacks.end();
+  }
+
+  destroy_window(g_engine.window);
+#endif // TGF_CODEGEN;
+}
+
+// ============================================
 // @i: Type Info.
 // ============================================
 
@@ -797,6 +906,60 @@ b8 ensure_function(b8 expr, const char* fmt, ...)
 }
 
 #endif // TGF_DEBUG
+
+// ============================================
+// @i: Code-Gen.
+// ============================================
+
+const char* g_template_gen_array = 
+"struct gen_array_$T                                  \n"
+"{                                                    \n"
+"   struct $T* data;                                  \n"
+"   s32 len;                                          \n"
+"};                                                   \n"
+"                                                     \n";
+
+static void replace_token(const char* src, const char* token, const char* replace, struct arena* arena, b8 add_null_terminator)
+{
+  u64 replace_len = strlen(replace);
+  u64 token_index = 0;
+  for each_index(i, (s32) strlen(src))
+  {
+    char c = src[i];
+    if (c == token[token_index])
+    {
+      token_index += 1;
+      if (token_index == strlen(token))
+      {
+        // Token recognized, paste the replace.
+        char* pc = (char*) arena_push(arena, replace_len, ALIGN_OF(char), false);
+        memcpy(pc, replace, replace_len);
+        token_index = 0;
+      }
+      continue;
+    }
+    // Paste the char if no token.
+    char* pc = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
+    *pc = c;
+  }
+
+  if (add_null_terminator)
+  {
+    char* pc = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
+    *pc = '\0';
+  }
+}
+
+void generate_code()
+{
+  FILE* file = NULL;
+  fopen_s(&file, ".code_gen.h", "w");
+  struct arena* arena = arena_alloc_default();
+  replace_token(g_template_gen_array, "$T", "dummy", arena, true);
+  char* data = arena_first(arena, char);
+  fputs(data, file);
+  fclose(file);
+}
 
 // ============================================
 // @i: OS.

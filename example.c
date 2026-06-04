@@ -6,44 +6,28 @@
 #define TGF_OPENGL
 #include "TGF.h"
 
-b8 quit = false;
+union vec4 bg_color_a = COLOR_CORN_FLOWER_BLUE;
+union vec4 bg_color_b = COLOR_CHILL_GREEN;
+
+static void tick(f32 dt)
+{
+  UNUSED(dt);
+
+  if (is_key_down('V'))
+  {
+    g_engine.clear_color = bg_color_a;
+  }
+  else
+  {
+    g_engine.clear_color = bg_color_b;
+  }
+}
 
 s32 main(s32 argc, char** argv) 
 {
-  UNUSED(argc);
-  UNUSED(argv);
-  trace("This is Tiny Game Framework example!");
-  struct window* window = create_window_default();
-
-  union vec4 bg_color_a = COLOR_CORN_FLOWER_BLUE;
-  union vec4 bg_color_b = COLOR_CHILL_GREEN;
-
-  while (!quit)
-  {
-    poll_events();
-
-    if (is_key_down('V'))
-    {
-      clear_screen(bg_color_a);
-    }
-    else
-    {
-      clear_screen(bg_color_b);
-    }
-
-    struct input_event_view view = events_this_frame();
-    for each_index(i, view.len)
-    {
-      struct input_event* ev = &view.data[i];
-
-      if (ev->kind == INPUT_EVENT_QUIT)
-      {
-        quit = true;
-        break;
-      }
-    }
-    
-    swap_buffers(window, /*vsync*/ true);
-  }
-  destroy_window(window);
+  struct engine_params p = DEFAULT_ENGINE_PARAMS;
+  p.argv = argv;
+  p.argc = argc;
+  p.callbacks.tick = &tick;
+  engine_run(&p);
 }
