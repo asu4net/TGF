@@ -15,7 +15,7 @@ s32 main(s32 argc, char** argv)
   trace("This is Tiny Game Framework example!");
   struct window* window = create_window_default();
 
-  while(!quit)
+  while (!quit)
   {
     clear_screen(COLOR_RED);
     poll_events();

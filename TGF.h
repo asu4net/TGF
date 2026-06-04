@@ -495,16 +495,16 @@ typedef u32 Key;
 
 enum
 {
-  Key_Unknown = 0
+    KEY_UNKNOWN = 0
     
   // *** ASCII (REAL CODES) ***
 
-  , Key_Backspace    = 8
-  , Key_Tab          = 9
-  , Key_Linefeed     = 10
-  , Key_Enter        = 13
-  , Key_Escape       = 27
-  , Key_Space        = 32
+  , KEY_BACKSPACE    = 8
+  , KEY_TAB          = 9
+  , KEY_LINEFEED     = 10
+  , KEY_ENTER        = 13
+  , KEY_ESCAPE       = 27
+  , KEY_SPACE        = 32
 
   // @Note: Here live ASCII letters, digits and symbols via direct char input.
   // They are not enumerated because they are received as char or UTF-32 text.
@@ -512,39 +512,39 @@ enum
   // *** END OF ASCII ***
   // Begin custom keycodes (physical keys)
 
-  , _Key_BEGIN_NON_ASCII = 512 // @Note: Explicit boundary to avoid collisions.
+  , KEY_BEGIN_NON_ASCII = 512 // @Note: Explicit boundary to avoid collisions.
 
-  , Key_Delete       
-  , Key_Arrow_Up     
-  , Key_Arrow_Down   
-  , Key_Arrow_Left   
-  , Key_Arrow_Right  
-  , Key_Page_Up      
-  , Key_Page_Down    
-  , Key_Home         
-  , Key_End          
-  , Key_Insert       
-  , Key_Pause        
-  , Key_Scroll_Lock  
-  , Key_Alt          
-  , Key_Ctrl         
-  , Key_Shift        
-  , Key_CMD          
+  , KEY_DELETE       
+  , KEY_ARROW_UP     
+  , KEY_ARROW_DOWN   
+  , KEY_ARROW_LEFT   
+  , KEY_ARROW_RIGHT  
+  , KEY_PAGE_UP      
+  , KEY_PAGE_DOWN    
+  , KEY_HOME         
+  , KEY_END          
+  , KEY_INSERT       
+  , KEY_PAUSE        
+  , KEY_SCROLL_LOCK  
+  , KEY_ALT          
+  , KEY_CTRL         
+  , KEY_SHIFT        
+  , KEY_CMD          
 
   // *** FUNCTION KEYS ***
-  , Key_F1  , Key_F2  , Key_F3  , Key_F4  , Key_F5  , Key_F6  , Key_F7  , Key_F8  , Key_F9 , Key_F10
-  , Key_F11 , Key_F12 , Key_F13 , Key_F14 , Key_F15 , Key_F16 , Key_F17 , Key_F18 , Key_F19
-  , Key_F20 , Key_F21 , Key_F22 , Key_F23 , Key_F24
+  , KEY_F1  , KEY_F2  , KEY_F3  , KEY_F4  , KEY_F5  , KEY_F6  , KEY_F7  , KEY_F8  , KEY_F9 , KEY_F10
+  , KEY_F11 , KEY_F12 , KEY_F13 , KEY_F14 , KEY_F15 , KEY_F16 , KEY_F17 , KEY_F18 , KEY_F19
+  , KEY_F20 , KEY_F21 , KEY_F22 , KEY_F23 , KEY_F24
 
-  , Key_Print_Screen
+  , KEY_PRINT_SCREEN
 
   // *** MOUSE AS BUTTON INPUT KEYS ***
-  , Key_Mouse_Left
-  , Key_Mouse_Middle
-  , Key_Mouse_Right
+  , KEY_MOUSE_LEFT
+  , KEY_MOUSE_MIDDLE
+  , KEY_MOUSE_RIGHT
 
   // *** End ***
-  , Key_Count
+  , KEY_COUNT
 };
 
 typedef enum Input_Event_Kind 
@@ -617,7 +617,7 @@ FOR_OPEN_GL_FUNCTIONS(DO_FUNCTION_DECLARATIONS)
 // ============================================
 
 #ifdef TGF_OPENGL
-b8 gl_context_create(struct window*  window);
+b8 gl_context_create(struct window* window);
 #endif
 
 // ============================================
@@ -1036,7 +1036,7 @@ void temp_end(struct temp temp)
 static enum cursor_mode g_cursor_mode = CURSOR_MODE_DEFAULT;
 static struct arena* g_input_events_arena = NULL;
 static s32 g_input_events_len = 0;
-static b8 g_key_down_table[Key_Count] = nil;
+static b8 g_key_down_table[KEY_COUNT] = nil;
 
 #ifdef TGF_WINDOWS
 
@@ -1112,29 +1112,29 @@ static Key key_from_vk(WPARAM wParam)
   // *** NON ASCII ***
   switch (wParam)
   {
-  case VK_BACK:       return Key_Backspace;
-  case VK_TAB:        return Key_Tab;
-  case VK_RETURN:     return Key_Enter;
-  case VK_ESCAPE:     return Key_Escape;
-  case VK_SPACE:      return Key_Space;
-  case VK_DELETE:     return Key_Delete;
-  case VK_UP:         return Key_Arrow_Up;
-  case VK_DOWN:       return Key_Arrow_Down;
-  case VK_LEFT:       return Key_Arrow_Left;
-  case VK_RIGHT:      return Key_Arrow_Right;
-  case VK_PRIOR:      return Key_Page_Up;
-  case VK_NEXT:       return Key_Page_Down;
-  case VK_HOME:       return Key_Home;
-  case VK_END:        return Key_End;
-  case VK_INSERT:     return Key_Insert;
-  case VK_PAUSE:      return Key_Pause;
-  case VK_SCROLL:     return Key_Scroll_Lock;
-  case VK_MENU:       return Key_Alt;
-  case VK_CONTROL:    return Key_Ctrl;
-  case VK_SHIFT:      return Key_Shift;
+  case VK_BACK:       return KEY_BACKSPACE;
+  case VK_TAB:        return KEY_TAB;
+  case VK_RETURN:     return KEY_ENTER;
+  case VK_ESCAPE:     return KEY_ESCAPE;
+  case VK_SPACE:      return KEY_SPACE;
+  case VK_DELETE:     return KEY_DELETE;
+  case VK_UP:         return KEY_ARROW_UP;
+  case VK_DOWN:       return KEY_ARROW_DOWN;
+  case VK_LEFT:       return KEY_ARROW_LEFT;
+  case VK_RIGHT:      return KEY_ARROW_RIGHT;
+  case VK_PRIOR:      return KEY_PAGE_UP;
+  case VK_NEXT:       return KEY_PAGE_DOWN;
+  case VK_HOME:       return KEY_HOME;
+  case VK_END:        return KEY_END;
+  case VK_INSERT:     return KEY_INSERT;
+  case VK_PAUSE:      return KEY_PAUSE;
+  case VK_SCROLL:     return KEY_SCROLL_LOCK;
+  case VK_MENU:       return KEY_ALT;
+  case VK_CONTROL:    return KEY_CTRL;
+  case VK_SHIFT:      return KEY_SHIFT;
   case VK_LWIN:
-  case VK_RWIN:       return Key_CMD;
-  case VK_SNAPSHOT:   return Key_Print_Screen;
+  case VK_RWIN:       return KEY_CMD;
+  case VK_SNAPSHOT:   return KEY_PRINT_SCREEN;
 
   // @Note: Apparently this doesn't work.
   //case VK_LBUTTON:    return Key_Mouse_Left;
@@ -1145,10 +1145,10 @@ static Key key_from_vk(WPARAM wParam)
   // *** FUNCTION KEYS ***
   if (wParam >= VK_F1 && wParam <= VK_F24)
   {
-    return (Key) (Key_F1 + (wParam - VK_F1));
+    return (Key) (KEY_F1 + (wParam - VK_F1));
   }
 
-  return Key_Unknown;
+  return KEY_UNKNOWN;
 }
 
 static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -1251,7 +1251,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Key;
-      ev->key = Key_Mouse_Left;
+      ev->key = KEY_MOUSE_LEFT;
       
       b8 down = msg == WM_LBUTTONDOWN;
       ev->key_state = down ? KEY_STATE_DOWN : KEY_STATE_END;
@@ -1265,7 +1265,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Key;
-      ev->key = Key_Mouse_Right;
+      ev->key = KEY_MOUSE_RIGHT;
       
       b8 down = msg == WM_RBUTTONDOWN;
       ev->key_state = down ? KEY_STATE_DOWN : KEY_STATE_END;
@@ -1279,7 +1279,7 @@ static CALLBACK LRESULT process_events(HWND hWnd, UINT msg, WPARAM wParam, LPARA
       Input_Event* ev = arena_push_element(g_input_events_arena, Input_Event);
       g_input_events_len += 1;
       ev->kind = Input_Event_Kind_Key;
-      ev->key = Key_Mouse_Middle;
+      ev->key = KEY_MOUSE_MIDDLE;
       
       b8 down = msg == WM_MBUTTONDOWN;
       ev->key_state = down ? KEY_STATE_DOWN : KEY_STATE_END;
