@@ -107,6 +107,31 @@ typedef s8 b8;
 typedef u32 u32_enum;
 
 // ============================================
+// @: Type Info.
+// ============================================
+
+enum data_type
+{
+   TYPE_NONE
+  ,TYPE_FLOAT
+  ,TYPE_FLOAT2
+  ,TYPE_FLOAT3
+  ,TYPE_FLOAT4
+  ,TYPE_MAT3
+  ,TYPE_MAT4
+  ,TYPE_INT
+  ,TYPE_INT2
+  ,TYPE_INT3
+  ,TYPE_INT4
+  ,TYPE_SAMPLER2D
+  ,TYPE_BOOL
+};
+
+b8 is_integer_type(enum data_type type);
+u32 get_type_size(enum data_type type);
+u32 get_type_len(enum data_type type);
+
+// ============================================
 // @: Helper Macros.
 // ============================================
 
@@ -628,8 +653,7 @@ extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 extern PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
-typedef struct GL_Win32_Context GL_Win32_Context;
-struct GL_Win32_Context 
+struct wgl_context
 { 
   HGLRC handle;
   HDC   device;
@@ -640,7 +664,7 @@ struct GL_Win32_Context
 // So creating a context just means occuping the same slot
 // as the window.
 
-extern GL_Win32_Context g_wgl_context_array[MAX_WINDOWS];
+extern struct wgl_context g_wgl_context_array[MAX_WINDOWS];
 
 #endif // defined(TGF_OPENGL) && defined(TGF_WINDOWS)
 
@@ -655,6 +679,80 @@ void clear_screen(union vec4 color);
 // ============================================================================================================================================================================================================================
 
 #ifdef TGF_IMPL
+
+// ============================================
+// @i: Type Info.
+// ============================================
+
+b8 is_integer_type(enum data_type type)
+{
+  switch (type) 
+  {
+    case TYPE_FLOAT:
+    case TYPE_FLOAT2:
+    case TYPE_FLOAT3:
+    case TYPE_FLOAT4:
+    case TYPE_MAT3:
+    case TYPE_MAT4: 
+      return false; 
+    case TYPE_INT:
+    case TYPE_INT2:
+    case TYPE_INT3:
+    case TYPE_INT4:
+    case TYPE_SAMPLER2D:
+    case TYPE_BOOL: 
+      return true;
+    case TYPE_NONE:
+    default: 
+      check(false); 
+      return false;
+  }
+}
+
+u32 get_type_size(enum data_type type)
+{
+  switch(type) 
+  {
+    case TYPE_FLOAT     : return 4;
+    case TYPE_FLOAT2    : return 4 * 2;
+    case TYPE_FLOAT3    : return 4 * 3;
+    case TYPE_FLOAT4    : return 4 * 4;
+    case TYPE_MAT3      : return 4 * 3 * 3;
+    case TYPE_MAT4      : return 4 * 4 * 4;
+    case TYPE_INT       : return 4;
+    case TYPE_SAMPLER2D : return 32;
+    case TYPE_INT2      : return 4 * 2;
+    case TYPE_INT3      : return 4 * 3;
+    case TYPE_INT4      : return 4 * 4;
+    case TYPE_BOOL      : return 1;
+    case TYPE_NONE: 
+    default: 
+      check(false); 
+      return 0;
+  }
+}
+
+u32 get_type_len(enum data_type type)
+{
+  switch(type) 
+  {
+    case TYPE_FLOAT     : return 1;         
+    case TYPE_FLOAT2    : return 2;
+    case TYPE_FLOAT3    : return 3;
+    case TYPE_FLOAT4    : return 4;
+    case TYPE_MAT3      : return 3 * 3;
+    case TYPE_MAT4      : return 4 * 4;
+    case TYPE_INT       : return 1;
+    case TYPE_SAMPLER2D : return 32;
+    case TYPE_INT2      : return 2;
+    case TYPE_INT3      : return 3;
+    case TYPE_INT4      : return 4;
+    case TYPE_BOOL      : return 1;
+    default: 
+      check(false); 
+      return 0;
+  }
+}
 
 // ============================================
 // @i: Log and Assert macros.
@@ -1627,7 +1725,7 @@ void swap_buffers(struct window*  window, b8 vsync)
 {
   wglSwapIntervalEXT(vsync ? 1 : 0);
   check(window->handle != NULL);
-  GL_Win32_Context* context = &g_wgl_context_array[window->index];
+  struct wgl_context* context = &g_wgl_context_array[window->index];
   check(context->device != NULL);
   SwapBuffers(context->device);
 }
@@ -1657,7 +1755,7 @@ FOR_OPEN_GL_FUNCTIONS(DO_FUNCTION_POINTER_DEFINITIONS)
 
 #if defined(TGF_OPENGL) && defined(TGF_WINDOWS)
 
-GL_Win32_Context g_wgl_context_array[MAX_WINDOWS] = nil;
+struct wgl_context g_wgl_context_array[MAX_WINDOWS] = nil;
 
 // @Note: Windows sucks.
 
@@ -1763,7 +1861,7 @@ b8 gl_context_create(struct window* window)
     return false;
   }
   
-  GL_Win32_Context* context = &g_wgl_context_array[window->index];
+  struct wgl_context* context = &g_wgl_context_array[window->index];
 
   if (!ensure_msg(context->handle == NULL, "This window has already an associated context!"))
   {
@@ -1853,6 +1951,8 @@ void clear_screen(union vec4 color)
   glClearColor(color.x, color.y, color.z, color.w);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
+
+
 
 #endif
 
