@@ -1,10 +1,10 @@
-// ============================================
+// ============================================================================================
 // @: Info.
-// ============================================
+// ============================================================================================
 //
 // Usage:
 //
-// 1. Just define TGF_IMPL before including in one *.c or *.cpp file.
+// 1. Just define ENGINE_IMPLEMENTATION before including in one *.c or *.cpp file.
 // 2. Link the platform specific libs:
 //
 // Link:
@@ -17,82 +17,56 @@
 //
 // Compile Flags:
 //
-// TGF_IMPL    Pastes the function implementations.
-// TGF_DEBUG   Enables trace, check, ensure macros.
-// TGF_OPENGL  Uses OpenGL.
-// TGF_CODEGEN Starts with in code-generation mode.
+// ENGINE_IMPLEMENTATION         Pastes the function implementations.
+// ENGINE_DEBUG        Enables trace, check, ensure macros.
+// ENGINE_API_OPENGL   Uses OpenGL.
+// ENGINE_MODE_CODEGEN Starts with in code-generation mode.
+
+#define ENGINE_API_OPENGL // @Note: For now we force the OpenGL implementation.
 
 #ifndef TINY_GAME_FRAMEWORK_H
 #define TINY_GAME_FRAMEWORK_H
 
+// ============================================================================================
+// @: BEGIN OF DECLARATIONS
+// ============================================================================================
+
 // ============================================
-// @: Platform detection.
+// @: core.h
 // ============================================
 
-#ifdef _WIN32
+// Platform detection.
+
 #ifdef _WIN64
-#define TGF_WINDOWS
+#define ENGINE_OS_WINDOWS
 #else
-#error "x86 Builds are not supported!"
-#endif
-#elif defined(__APPLE__) || defined(__MACH__)
-#include <TargetConditionals.h>
-// TARGET_OS_MAC exists on all the platforms
-// so we must check all of them (in this order)
-// to ensure that we're running on MAC
-// and not some other Apple platform.
-#if TARGET_IPHONE_SIMULATOR == 1
-#error "IOS simulator is not supported!"
-#elif TARGET_OS_IPHONE == 1
-#define TGF_IOS
-#error "IOS is not supported!"
-#elif TARGET_OS_MAC == 1
-#define TGF_MACOS
-#error "MacOS is not supported!"
-#else
-#error "Unknown Apple platform!"
-#endif
-// We also have to check __ANDROID__ before __linux__
-// since android is based on the linux kernel
-// it has __linux__ defined */
-#elif defined(__ANDROID__)
-#define TGF_ANDROID
-#error "Android is not supported!"
-#elif defined(__linux__)
-#define TGF_LINUX 
-#error "Linux is not supported!"
-#else
-#error "Unknown platform!"
+#error "Unsupported platform!"
 #endif
 
 #if defined(__cplusplus)
-#define TGF_CPP
+#define ENGINE_LANG_CPP
 #else
-#define TGF_C
+#define ENGINE_LANG_C
 #endif
 
-// ============================================
-// @: Vendor headers.
-// ============================================
+// Vendor headers.
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 
-#ifdef TGF_WINDOWS 
+#ifdef ENGINE_OS_WINDOWS 
 #define UNICODE
 #define _UNICODE
 #include <Windows.h>
 #endif
 
-#ifdef TGF_OPENGL
+#ifdef ENGINE_API_OPENGL
 #include "GL/GL.h"
 #endif
 
-// ============================================
-// @: Numeric Types.
-// ============================================
+// Numeric types.
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -107,117 +81,29 @@ typedef double f64;
 typedef s8 b8;
 typedef u32 u32_enum;
 
-// ============================================
-// @: Type Info.
-// ============================================
-
-enum data_type
-{
-   TYPE_NONE
-  ,TYPE_FLOAT
-  ,TYPE_FLOAT2
-  ,TYPE_FLOAT3
-  ,TYPE_FLOAT4
-  ,TYPE_MAT3
-  ,TYPE_MAT4
-  ,TYPE_INT
-  ,TYPE_INT2
-  ,TYPE_INT3
-  ,TYPE_INT4
-  ,TYPE_SAMPLER2D
-  ,TYPE_BOOL
-};
-
-b8 is_integer_type(enum data_type type);
-u32 get_type_size(enum data_type type);
-u32 get_type_len(enum data_type type);
-
-// ============================================
-// @: Helper Macros.
-// ============================================
-
-// Heavily used macros ---------------------------------------- 
-
-// Custom true/false literals.
-#ifdef TGF_C
+// Cross-language true/false macros.
+#ifdef ENGINE_LANG_C
 #undef true
 #undef false
 #define true ((b8) 1)
 #define false ((b8) 0)
 #endif
 
-// Logging and assertions macros.
-
-// Logging/Assertion Helper functions -------
-#ifdef TGF_DEBUG
-
-void trace_function  (const char* fmt, ...);
-void check_function  (b8 expr, const char* fmt, ...);
-b8   ensure_function (b8 expr, const char* fmt, ...);
-
-#endif
-//-------------------------------------------
-
-#ifdef TGF_DEBUG
-#define trace(X, ...) (trace_function(X, ##__VA_ARGS__))
-#else
-#define trace(X, ...)
-#endif
-
-#ifdef TGF_DEBUG
-#define check(X) check_function((X), "Check failed: %s\n", #X)
-#define check_msg(X, ...) check_function((X), __VA_ARGS__)
-#define ensure(X) ensure_function((X), "Ensure failed: %s\n", #X)
-#define ensure_msg(X, ...) ensure_function((X), __VA_ARGS__)
-#else
-#define check(X) ((void)0)
-#define check_msg(...) ((void)0)
-#define ensure(X) (X)
-#define ensure_msg(X, ...) (X)
-#endif
-
-// Loop helpers.
-#define each_index(it, count) (s32 it = 0; it < (count); it += 1)
-
-// Cross-language zero struct literal.
-#if defined(TGF_CPP)
+// Cross-language zero struct literal macros.
+#if defined(ENGINE_LANG_CPP)
 #define nil {}
-#elif defined(TGF_C)
+#elif defined(ENGINE_LANG_C)
 #define nil {0}
 #endif
 
-// Cross-language struct intializer/designated initializer list helper.
-#if defined(TGF_CPP)
+// Cross-language struct intializer/designated initializer list helper macros.
+#if defined(ENGINE_LANG_CPP)
 #define make_struct(T, ...) { __VA_ARGS__ }
 #define make_union(T, ...) { __VA_ARGS__ }
-#elif defined(TGF_C)
+#elif defined(ENGINE_LANG_C)
 #define make_struct(T, ...) (struct T){ __VA_ARGS__ }
 #define make_union(T, ...) (union T){ __VA_ARGS__ }
 #endif
-
-// ----------------------------------------------------------
-
-// Static assert.
-#ifdef TGF_DEBUG
-#define STATIC_CHECK(C, ID) static u8 GLUE(ID, __LINE__)[(C)?1:-1] // @Review: Maybe we shouldn't get rid of this one, ever.
-#else
-#define STATIC_CHECK(C, ID)
-#endif
-
-// Units.
-#define KB(n) (((u64)(n)) << 10)
-#define MB(n) (((u64)(n)) << 20)
-#define GB(n) (((u64)(n)) << 30)
-#define TB(n) (((u64)(n)) << 40)
-#define THOUSAND(n) ((n)*1000)
-#define MILLION(n) ((n)*1000000)
-#define BILLION(n) ((n)*1000000000)
-
-// ALIGN_OF, MIN, MAX, CLAMP.
-#define ALIGN_OF(T) __alignof(T) // @Pending(Platform): This will work just in clang and msvc.
-#define MIN(A,B) (((A)<(B))?(A):(B))
-#define MAX(A,B) (((A)>(B))?(A):(B))
-#define CLAMP(A,X,B) (((X)<(A))?(A):((X)>(B))?(B):(X))
 
 // Macro expansion helpers.
 #define STRINGIFY_NO_EXPAND(S) #S
@@ -225,14 +111,9 @@ b8   ensure_function (b8 expr, const char* fmt, ...);
 #define GLUE_NO_EXPAND(A,B) A##B
 #define GLUE(A,B) GLUE_NO_EXPAND(A,B)
 
-// Misc.
-#define UNUSED(v) ((void)v)
-#define DEFER_BLOCK(begin, end) for(s32 _i_ = ((begin), 0); !_i_; _i_ += 1, (end))
-#define ALIGN_POW2(x,b) (((x) + (b) - 1)&(~((b) - 1))) // @Note: b has to be pow2. 
-
-// Debug break.
-#ifdef TGF_DEBUG
-#ifdef TGF_WINDOWS
+// Debug break macros.
+#ifdef ENGINE_DEBUG
+#ifdef ENGINE_OS_WINDOWS
 #define STOP_AT_THIS_LINE() __debugbreak()
 #else
 #define STOP_AT_THIS_LINE()
@@ -241,14 +122,81 @@ b8   ensure_function (b8 expr, const char* fmt, ...);
 #define STOP_AT_THIS_LINE()
 #endif
 
-// ============================================
-// @: Code-Gen.
-// ============================================
+// Log and assertion macros.
+#ifdef ENGINE_DEBUG
+inline void trace_function(const char* fmt, ...) 
+{
+  va_list args;
+  va_start(args, fmt);
+  vprintf(fmt, args);
+  va_end(args);
+  printf("\n");
+}
+inline void check_function(b8 expr, const char* fmt, ...) 
+{
+  if (expr == false) 
+  {
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+    printf("\n");
+    STOP_AT_THIS_LINE();
+  }
+}
+inline b8 ensure_function(b8 expr, const char* fmt, ...) 
+{
+  if (expr == false) 
+  {
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+    printf("\n");
+    STOP_AT_THIS_LINE();
+  }
+  return expr != 0;
+}
+#define trace(X, ...) (trace_function(X, ##__VA_ARGS__))
+#define STATIC_CHECK(C, ID) static u8 GLUE(ID, __LINE__)[(C)?1:-1] // @Review: Maybe we shouldn't get rid of this one, ever.
+#define check(X) check_function((X), "Check failed: %s\n", #X)
+#define check_msg(X, ...) check_function((X), __VA_ARGS__)
+#define ensure(X) ensure_function((X), "Ensure failed: %s\n", #X)
+#define ensure_msg(X, ...) ensure_function((X), __VA_ARGS__)
+#else // ENGINE_DEBUG
+#define trace(X, ...)
+#define STATIC_CHECK(C, ID)
+#define check(X) ((void)0)
+#define check_msg(...) ((void)0)
+#define ensure(X) (X)
+#define ensure_msg(X, ...) (X)
+#endif
 
-void generate_code();
+// Loop helpers macros.
+#define each_index(it, count) (s32 it = 0; it < (count); it += 1)
+
+// Unit macros.
+#define KB(n) (((u64)(n)) << 10)
+#define MB(n) (((u64)(n)) << 20)
+#define GB(n) (((u64)(n)) << 30)
+#define TB(n) (((u64)(n)) << 40)
+#define THOUSAND(n) ((n)*1000)
+#define MILLION(n) ((n)*1000000)
+#define BILLION(n) ((n)*1000000000)
+
+// ALIGN_OF, MIN, MAX, CLAMP macros.
+#define ALIGN_OF(T) __alignof(T) // @Pending(Platform): This will work just in clang and msvc.
+#define MIN(A,B) (((A)<(B))?(A):(B))
+#define MAX(A,B) (((A)>(B))?(A):(B))
+#define CLAMP(A,X,B) (((X)<(A))?(A):((X)>(B))?(B):(X))
+
+// Misc macros.
+#define UNUSED(v) ((void)v)
+#define DEFER_BLOCK(begin, end) for(s32 _i_ = ((begin), 0); !_i_; _i_ += 1, (end))
+#define ALIGN_POW2(x,b) (((x) + (b) - 1)&(~((b) - 1))) // @Note: b has to be pow2. 
 
 // ============================================
-// @: OS.
+// @: System.
 // ============================================
 
 // @Pending(Platform): All the OS code it is just windows for now.
@@ -344,6 +292,37 @@ void            temp_end              (struct temp temp);
 #define arena_push_array(a, T, c) arena_push_array_aligned(a, T, c, MAX(8, ALIGN_OF(T)))
 #define arena_push_element(a, T) (T*) arena_push((a), sizeof(T), ALIGN_OF(T), (1))
 #define arena_first(a, T) (T*) arena_first_raw((a), ALIGN_OF(T))
+
+// ============================================
+// @: Type Info.
+// ============================================
+
+enum data_type
+{
+   TYPE_NONE
+  ,TYPE_FLOAT
+  ,TYPE_FLOAT2
+  ,TYPE_FLOAT3
+  ,TYPE_FLOAT4
+  ,TYPE_MAT3
+  ,TYPE_MAT4
+  ,TYPE_INT
+  ,TYPE_INT2
+  ,TYPE_INT3
+  ,TYPE_INT4
+  ,TYPE_SAMPLER2D
+  ,TYPE_BOOL
+};
+
+b8 is_integer_type(enum data_type type);
+u32 get_type_size(enum data_type type);
+u32 get_type_len(enum data_type type);
+
+// ============================================
+// @: Code-Gen.
+// ============================================
+
+void generate_code();
 
 // ============================================
 // @: Vec2.
@@ -479,7 +458,7 @@ struct window* create_window_default();
 struct window* create_window(struct window_params* params);
 void destroy_window(struct window* window);
 
-#ifdef TGF_OPENGL
+#ifdef ENGINE_API_OPENGL
 void swap_buffers(struct window* window, b8 vsync);
 #endif
 
@@ -607,7 +586,7 @@ b8 is_key_down(u32 key);
 // @: OpenGL Functions.
 // ============================================
 
-#ifdef TGF_OPENGL
+#ifdef ENGINE_API_OPENGL
 
 // Utility function types.
 typedef void (*GLDebugProc)(u32_enum source, u32_enum type, u32 id, u32_enum severity, s32 length, const char* message, const void* userParam);
@@ -629,7 +608,7 @@ FOR_OPEN_GL_FUNCTIONS(DO_FUNCTION_DECLARATIONS)
 // @: OpenGL Context.
 // ============================================
 
-#ifdef TGF_OPENGL
+#ifdef ENGINE_API_OPENGL
 b8 gl_context_create(struct window* window);
 #endif
 
@@ -637,7 +616,7 @@ b8 gl_context_create(struct window* window);
 // @: OpenGL Context (Windows).
 // ============================================
 
-#if defined(TGF_OPENGL) && defined(TGF_WINDOWS)
+#if defined(ENGINE_API_OPENGL) && defined(ENGINE_OS_WINDOWS)
 
 typedef BOOL (WINAPI *PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
 typedef HGLRC (WINAPI *PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
@@ -660,7 +639,7 @@ struct wgl_context
 
 extern struct wgl_context g_wgl_context_array[MAX_WINDOWS];
 
-#endif // defined(TGF_OPENGL) && defined(TGF_WINDOWS)
+#endif // defined(ENGINE_API_OPENGL) && defined(ENGINE_OS_WINDOWS)
 
 // ============================================
 // @: Graphics.
@@ -669,303 +648,24 @@ extern struct wgl_context g_wgl_context_array[MAX_WINDOWS];
 void clear_screen(union vec4 color);
 
 #endif // TINY_GAME_FRAMEWORK_H
+  
+// ============================================================================================
+// @: END OF DECLARATIONS
+// ============================================================================================
 
-// ============================================================================================================================================================================================================================
+// ============================================================================================
+// @i: BEGIN OF IMPLEMENTATIONS
+// ============================================================================================
 
-#ifdef TGF_IMPL
-
-// ============================================
-// @i: Entry Point.
-// ============================================
-
-typedef void(*CALLBACK_RUN)();
-typedef void(*CALLBACK_PROCESS_EVENTS)(struct input_event* event);
-typedef void(*CALLBACK_TICK)(f32 dt);
-typedef void(*CALLBACK_END)();
-
-struct engine_callbacks
-{
-  CALLBACK_RUN run;
-  CALLBACK_PROCESS_EVENTS on_event;
-  CALLBACK_TICK tick;
-  CALLBACK_END end;
-};
-
-struct engine_params
-{
-  char** argv;
-  s32 argc;
-  struct engine_callbacks callbacks;
-};
-
-#define DEFAULT_ENGINE_PARAMS make_struct(engine_params,  \
-  .argv = NULL,                                           \
-  .argc = 0,                                              \
-  .callbacks = make_struct(engine_callbacks,              \
-    .run = NULL,                                          \
-    .on_event = NULL,                                     \
-    .tick = NULL,                                         \
-    .end = NULL,                                          \
-  )                                                       \
-);
-
-struct 
-{
-  b8 quit;
-  b8 vsync;
-  union vec4 clear_color;
-  struct window* window;
-  struct engine_callbacks callbacks;
-} g_engine = nil;
-
-static void engine_run(struct engine_params* params)
-{
-#ifdef TGF_CODEGEN
-  UNUSED(params);
-  generate_code();
-#else
-  // Initialization.
-  g_engine.clear_color = COLOR_CHILL_GREEN;
-  g_engine.vsync = true;
-  g_engine.window = create_window_default();
-  g_engine.callbacks = params->callbacks;
-
-  if (g_engine.callbacks.run)
-  {
-    g_engine.callbacks.run();
-  }
-
-  // Main loop.
-  while (!g_engine.quit)
-  {
-    poll_events();
-
-    struct input_event_view view = events_this_frame();
-
-    // Process events.
-    for each_index(i, view.len)
-    {
-      struct input_event* ev = &view.data[i];
-
-      if (ev->kind == INPUT_EVENT_QUIT)
-      {
-        g_engine.quit = true;
-        break;
-      }
-
-      if (ev->kind == INPUT_EVENT_KEY && ev->key == KEY_ESCAPE && ev->key_state == KEY_STATE_PRESSED)
-      {
-        g_engine.quit = true;
-        break;
-      }
-
-      if (g_engine.callbacks.on_event != NULL)
-      {
-        g_engine.callbacks.on_event(ev);
-      }
-    }
-
-    // Draw frame.
-    clear_screen(g_engine.clear_color);
-
-    if (g_engine.callbacks.tick != NULL)
-    {
-      g_engine.callbacks.tick(0);
-    }
-    
-    // Present.
-    swap_buffers(g_engine.window, g_engine.vsync);
-  }
-
-  // Finish.
-  if (g_engine.callbacks.end != NULL)
-  {
-    g_engine.callbacks.end();
-  }
-
-  destroy_window(g_engine.window);
-#endif // TGF_CODEGEN;
-}
+#ifdef ENGINE_IMPLEMENTATION
 
 // ============================================
-// @i: Type Info.
-// ============================================
-
-b8 is_integer_type(enum data_type type)
-{
-  switch (type) 
-  {
-    case TYPE_FLOAT:
-    case TYPE_FLOAT2:
-    case TYPE_FLOAT3:
-    case TYPE_FLOAT4:
-    case TYPE_MAT3:
-    case TYPE_MAT4: 
-      return false; 
-    case TYPE_INT:
-    case TYPE_INT2:
-    case TYPE_INT3:
-    case TYPE_INT4:
-    case TYPE_SAMPLER2D:
-    case TYPE_BOOL: 
-      return true;
-    case TYPE_NONE:
-    default: 
-      check(false); 
-      return false;
-  }
-}
-
-u32 get_type_size(enum data_type type)
-{
-  switch(type) 
-  {
-    case TYPE_FLOAT     : return 4;
-    case TYPE_FLOAT2    : return 4 * 2;
-    case TYPE_FLOAT3    : return 4 * 3;
-    case TYPE_FLOAT4    : return 4 * 4;
-    case TYPE_MAT3      : return 4 * 3 * 3;
-    case TYPE_MAT4      : return 4 * 4 * 4;
-    case TYPE_INT       : return 4;
-    case TYPE_SAMPLER2D : return 32;
-    case TYPE_INT2      : return 4 * 2;
-    case TYPE_INT3      : return 4 * 3;
-    case TYPE_INT4      : return 4 * 4;
-    case TYPE_BOOL      : return 1;
-    case TYPE_NONE: 
-    default: 
-      check(false); 
-      return 0;
-  }
-}
-
-u32 get_type_len(enum data_type type)
-{
-  switch(type) 
-  {
-    case TYPE_FLOAT     : return 1;         
-    case TYPE_FLOAT2    : return 2;
-    case TYPE_FLOAT3    : return 3;
-    case TYPE_FLOAT4    : return 4;
-    case TYPE_MAT3      : return 3 * 3;
-    case TYPE_MAT4      : return 4 * 4;
-    case TYPE_INT       : return 1;
-    case TYPE_SAMPLER2D : return 32;
-    case TYPE_INT2      : return 2;
-    case TYPE_INT3      : return 3;
-    case TYPE_INT4      : return 4;
-    case TYPE_BOOL      : return 1;
-    default: 
-      check(false); 
-      return 0;
-  }
-}
-
-// ============================================
-// @i: Log and Assert macros.
-// ============================================
-
-#ifdef TGF_DEBUG
-
-void trace_function(const char* fmt, ...) 
-{
-  va_list args;
-  va_start(args, fmt);
-  vprintf(fmt, args);
-  va_end(args);
-  printf("\n");
-}
-
-void check_function(b8 expr, const char* fmt, ...) 
-{
-  if (expr == false) 
-  {
-    va_list args;
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
-    printf("\n");
-    STOP_AT_THIS_LINE();
-  }
-}
-
-b8 ensure_function(b8 expr, const char* fmt, ...) 
-{
-  if (expr == false) 
-  {
-    va_list args;
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
-    printf("\n");
-    STOP_AT_THIS_LINE();
-  }
-  return expr != 0;
-}
-
-#endif // TGF_DEBUG
-
-// ============================================
-// @i: Code-Gen.
-// ============================================
-
-const char* g_template_gen_array = 
-"struct gen_array_$T                                  \n"
-"{                                                    \n"
-"   struct $T* data;                                  \n"
-"   s32 len;                                          \n"
-"};                                                   \n"
-"                                                     \n";
-
-static void replace_token(const char* src, const char* token, const char* replace, struct arena* arena, b8 add_null_terminator)
-{
-  u64 replace_len = strlen(replace);
-  u64 token_index = 0;
-  for each_index(i, (s32) strlen(src))
-  {
-    char c = src[i];
-    if (c == token[token_index])
-    {
-      token_index += 1;
-      if (token_index == strlen(token))
-      {
-        // Token recognized, paste the replace.
-        char* pc = (char*) arena_push(arena, replace_len, ALIGN_OF(char), false);
-        memcpy(pc, replace, replace_len);
-        token_index = 0;
-      }
-      continue;
-    }
-    // Paste the char if no token.
-    char* pc = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
-    *pc = c;
-  }
-
-  if (add_null_terminator)
-  {
-    char* pc = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
-    *pc = '\0';
-  }
-}
-
-void generate_code()
-{
-  FILE* file = NULL;
-  fopen_s(&file, ".code_gen.h", "w");
-  struct arena* arena = arena_alloc_default();
-  replace_token(g_template_gen_array, "$T", "dummy", arena, true);
-  char* data = arena_first(arena, char);
-  fputs(data, file);
-  fclose(file);
-}
-
-// ============================================
-// @i: OS.
+// @i: System.
 // ============================================
 
 struct system_info g_system_info;
 
-#ifdef TGF_WINDOWS
+#ifdef ENGINE_OS_WINDOWS
 
 struct system_info* get_system_info()
 {
@@ -1283,6 +983,134 @@ void temp_end(struct temp temp)
 }
 
 // ============================================
+// @i: Type Info.
+// ============================================
+
+b8 is_integer_type(enum data_type type)
+{
+  switch (type) 
+  {
+    case TYPE_FLOAT:
+    case TYPE_FLOAT2:
+    case TYPE_FLOAT3:
+    case TYPE_FLOAT4:
+    case TYPE_MAT3:
+    case TYPE_MAT4: 
+      return false; 
+    case TYPE_INT:
+    case TYPE_INT2:
+    case TYPE_INT3:
+    case TYPE_INT4:
+    case TYPE_SAMPLER2D:
+    case TYPE_BOOL: 
+      return true;
+    case TYPE_NONE:
+    default: 
+      check(false); 
+      return false;
+  }
+}
+
+u32 get_type_size(enum data_type type)
+{
+  switch(type) 
+  {
+    case TYPE_FLOAT     : return 4;
+    case TYPE_FLOAT2    : return 4 * 2;
+    case TYPE_FLOAT3    : return 4 * 3;
+    case TYPE_FLOAT4    : return 4 * 4;
+    case TYPE_MAT3      : return 4 * 3 * 3;
+    case TYPE_MAT4      : return 4 * 4 * 4;
+    case TYPE_INT       : return 4;
+    case TYPE_SAMPLER2D : return 32;
+    case TYPE_INT2      : return 4 * 2;
+    case TYPE_INT3      : return 4 * 3;
+    case TYPE_INT4      : return 4 * 4;
+    case TYPE_BOOL      : return 1;
+    case TYPE_NONE: 
+    default: 
+      check(false); 
+      return 0;
+  }
+}
+
+u32 get_type_len(enum data_type type)
+{
+  switch(type) 
+  {
+    case TYPE_FLOAT     : return 1;         
+    case TYPE_FLOAT2    : return 2;
+    case TYPE_FLOAT3    : return 3;
+    case TYPE_FLOAT4    : return 4;
+    case TYPE_MAT3      : return 3 * 3;
+    case TYPE_MAT4      : return 4 * 4;
+    case TYPE_INT       : return 1;
+    case TYPE_SAMPLER2D : return 32;
+    case TYPE_INT2      : return 2;
+    case TYPE_INT3      : return 3;
+    case TYPE_INT4      : return 4;
+    case TYPE_BOOL      : return 1;
+    default: 
+      check(false); 
+      return 0;
+  }
+}
+
+// ============================================
+// @i: Code-Gen.
+// ============================================
+
+const char* g_template_gen_array = 
+"struct gen_array_$T                                  \n"
+"{                                                    \n"
+"   struct $T* data;                                  \n"
+"   s32 len;                                          \n"
+"};                                                   \n"
+"                                                     \n";
+
+static void replace_token(const char* src, const char* token, const char* replace, struct arena* arena, b8 add_null_terminator)
+{
+  u64 replace_len = strlen(replace);
+  u64 token_index = 0;
+  for each_index(i, (s32) strlen(src))
+  {
+    char c = src[i];
+    if (c == token[token_index])
+    {
+      token_index += 1;
+      if (token_index == strlen(token))
+      {
+        // Token recognized, paste the replace.
+        char* pc = (char*) arena_push(arena, replace_len, ALIGN_OF(char), false);
+        memcpy(pc, replace, replace_len);
+        token_index = 0;
+      }
+      continue;
+    }
+    // Paste the char if no token.
+    char* pc = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
+    *pc = c;
+  }
+
+  if (add_null_terminator)
+  {
+    char* pc = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
+    *pc = '\0';
+  }
+}
+
+void generate_code()
+{
+  FILE* file = NULL;
+  fopen_s(&file, ".code_gen.h", "w");
+  struct arena* arena = arena_alloc_default();
+  replace_token(g_template_gen_array, "$T", "dummy", arena, true);
+  char* data = arena_first(arena, char);
+  fputs(data, file);
+  fclose(file);
+}
+
+// ============================================
 // @i: Input
 // ============================================
 
@@ -1291,7 +1119,7 @@ static struct arena* g_input_events_arena = NULL;
 static s32 g_input_events_len = 0;
 static b8 g_key_down_table[KEY_COUNT] = nil;
 
-#ifdef TGF_WINDOWS
+#ifdef ENGINE_OS_WINDOWS
 
 static void update_cursor() 
 {
@@ -1703,9 +1531,11 @@ static HWND create_win32_window(struct window_params* params)
 
     if (len == 0) 
     {
+#if ENGINE_DEBUG
       DWORD err = GetLastError();
       trace("Error! %lu\n", err);
       STOP_AT_THIS_LINE();
+#endif
       return NULL;
     }
   }
@@ -1816,7 +1646,7 @@ struct window* create_window(struct window_params* params)
   window->index  = g_window_array.len;
   g_window_array.len += 1;
 
-#ifdef TGF_OPENGL
+#ifdef ENGINE_API_OPENGL
   // @Review: Create the opengl context.
   b8 success = gl_context_create(window);
   UNUSED(success);
@@ -1880,7 +1710,7 @@ void destroy_window(struct window*  window)
   g_window_array.len -= 1;
 }
 
-#ifdef TGF_OPENGL
+#ifdef ENGINE_API_OPENGL
 
 void swap_buffers(struct window*  window, b8 vsync)
 {
@@ -1893,13 +1723,13 @@ void swap_buffers(struct window*  window, b8 vsync)
 
 #endif
 
-#endif // TGF_WINDOWS
+#endif // ENGINE_OS_WINDOWS
 
 // ============================================
 // @i: OpenGL Functions.
 // ============================================
 
-#ifdef TGF_OPENGL
+#ifdef ENGINE_API_OPENGL
 
 // Use X macro to generate the function pointers definitions.
 #define DO_FUNCTION_POINTER_DEFINITIONS(_NAME, _RETURN, _PARAMS) _RETURN (*_NAME) _PARAMS = NULL;                               \
@@ -1908,13 +1738,13 @@ FOR_OPEN_GL_FUNCTIONS(DO_FUNCTION_POINTER_DEFINITIONS)
 
 #undef DO_FUNCTION_POINTER_DEFINITIONS 
 
-#endif // TGF_OPENGL
+#endif // ENGINE_API_OPENGL
 
 // ============================================
 // @i: OpenGL Context (Windows).
 // ============================================
 
-#if defined(TGF_OPENGL) && defined(TGF_WINDOWS)
+#if defined(ENGINE_API_OPENGL) && defined(ENGINE_OS_WINDOWS)
 
 struct wgl_context g_wgl_context_array[MAX_WINDOWS] = nil;
 
@@ -2071,8 +1901,10 @@ b8 gl_context_create(struct window* window)
   s32 WGL_CONTEXT_MINOR_VERSION_ARB    = 0x2092;
   s32 WGL_CONTEXT_PROFILE_MASK_ARB     = 0x9126;
   s32 WGL_CONTEXT_CORE_PROFILE_BIT_ARB = 0x00000001;
+#ifdef ENGINE_DEBUG 
   s32 WGL_CONTEXT_FLAGS_ARB            = 0x2094;
   s32 WGL_CONTEXT_DEBUG_BIT_ARB        = 0x00000001;
+#endif
 
 	s32 context_attribs[] = 
   {
@@ -2080,7 +1912,7 @@ b8 gl_context_create(struct window* window)
 		WGL_CONTEXT_MINOR_VERSION_ARB  , 6,
 		WGL_CONTEXT_PROFILE_MASK_ARB   , WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 		
-		#ifdef TGF_DEBUG 
+#ifdef ENGINE_DEBUG 
 		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
 		#endif
 		
@@ -2099,13 +1931,13 @@ b8 gl_context_create(struct window* window)
   return true;
 }
 
-#endif // TGF_OPENGL && TGF_WINDOWS
+#endif // ENGINE_API_OPENGL && ENGINE_OS_WINDOWS
  
 // ============================================
 // @i: Graphics (OpenGL).
 // ============================================
 
-#ifdef TGF_OPENGL
+#ifdef ENGINE_API_OPENGL
 
 void clear_screen(union vec4 color)
 {
@@ -2113,8 +1945,123 @@ void clear_screen(union vec4 color)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+#endif // ENGINE_API_OPENGL
 
+// ============================================
+// @i: Entry Point.
+// ============================================
 
-#endif
+typedef void(*CALLBACK_RUN)();
+typedef void(*CALLBACK_PROCESS_EVENTS)(struct input_event* event);
+typedef void(*CALLBACK_TICK)(f32 dt);
+typedef void(*CALLBACK_END)();
 
-#endif // TGF_IMPL
+struct engine_callbacks
+{
+  CALLBACK_RUN run;
+  CALLBACK_PROCESS_EVENTS on_event;
+  CALLBACK_TICK tick;
+  CALLBACK_END end;
+};
+
+struct engine_params
+{
+  char** argv;
+  s32 argc;
+  struct engine_callbacks callbacks;
+};
+
+#define DEFAULT_ENGINE_PARAMS make_struct(engine_params,  \
+  .argv = NULL,                                           \
+  .argc = 0,                                              \
+  .callbacks = make_struct(engine_callbacks,              \
+    .run = NULL,                                          \
+    .on_event = NULL,                                     \
+    .tick = NULL,                                         \
+    .end = NULL,                                          \
+  )                                                       \
+);
+
+struct 
+{
+  b8 quit;
+  b8 vsync;
+  union vec4 clear_color;
+  struct window* window;
+  struct engine_callbacks callbacks;
+} g_engine = nil;
+
+static void engine_run(struct engine_params* params)
+{
+#ifdef ENGINE_MODE_CODEGEN
+  UNUSED(params);
+  generate_code();
+#else
+  // Initialization.
+  g_engine.clear_color = COLOR_CHILL_GREEN;
+  g_engine.vsync = true;
+  g_engine.window = create_window_default();
+  g_engine.callbacks = params->callbacks;
+
+  if (g_engine.callbacks.run)
+  {
+    g_engine.callbacks.run();
+  }
+
+  // Main loop.
+  while (!g_engine.quit)
+  {
+    poll_events();
+
+    struct input_event_view view = events_this_frame();
+
+    // Process events.
+    for each_index(i, view.len)
+    {
+      struct input_event* ev = &view.data[i];
+
+      if (ev->kind == INPUT_EVENT_QUIT)
+      {
+        g_engine.quit = true;
+        break;
+      }
+
+      if (ev->kind == INPUT_EVENT_KEY && ev->key == KEY_ESCAPE && ev->key_state == KEY_STATE_PRESSED)
+      {
+        g_engine.quit = true;
+        break;
+      }
+
+      if (g_engine.callbacks.on_event != NULL)
+      {
+        g_engine.callbacks.on_event(ev);
+      }
+    }
+
+    // Draw frame.
+    clear_screen(g_engine.clear_color);
+
+    if (g_engine.callbacks.tick != NULL)
+    {
+      g_engine.callbacks.tick(0);
+    }
+    
+    // Present.
+    swap_buffers(g_engine.window, g_engine.vsync);
+  }
+
+  // Finish.
+  if (g_engine.callbacks.end != NULL)
+  {
+    g_engine.callbacks.end();
+  }
+
+  destroy_window(g_engine.window);
+#endif // ENGINE_MODE_CODEGEN;
+}
+
+#endif // ENGINE_IMPLEMENTATION
+
+// ============================================================================================
+// @i: END OF IMPLEMENTATIONS
+// ============================================================================================

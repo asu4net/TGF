@@ -1,10 +1,5 @@
-#ifdef DEBUG
-#define TGF_DEBUG
-#endif
-
-#define TGF_IMPL
-#define TGF_OPENGL
-#include "TGF.h"
+#define ENGINE_IMPLEMENTATION
+#include "engine.h"
 
 union vec4 bg_color_a = COLOR_CORN_FLOWER_BLUE;
 union vec4 bg_color_b = COLOR_CHILL_GREEN;

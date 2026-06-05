@@ -1,24 +1,25 @@
-# Tiny Game Framework (TGF)
+# Tiny Engine
 
-TGF pretends to be a minimalistic cross-platform abstraction layer for common things in games.
+This project pretends to be a minimalistic abstraction layer for common things in games.
 
 > **Note:**
 > This project is in a premature development stage, don't use it, unless you are open to extend this for your specific needs.
 
 Features:
+- Single header implementation.
 - Works on C99 and C++20 out of the box (tested using clang++).
+- Arenas.
 - Window creation.
 - Keyboard and mouse input.
 - OpenGL context creation.
 - Basic math constructs.
-- Memory arenas.
 
 > **Note:**
 > Almost all features are Windows only for now. 
 
 Installation:
-- Include `TGF.h` wherever you want.
-- At least in one translation unit define `TGF_IMPL` and include `TGF.h`.
+- Include `engine.h` wherever you want.
+- At least in one translation unit define `ENGINE_IMPLEMENTATION` and include `engine.h`.
 - Enjoy.
 
 Linking:

@@ -9,7 +9,7 @@ set links=-lopengl32 -lgdi32 -luser32 -lwinmm
 set errors=-Werror -Wall -Wextra -Wconversion -Wsign-conversion
 
 set build=clang++ -std=c++20 %target% %includes% %links% %errors%
-set build_dbg=%build% -o %out_dbg%\%out_file% -g -O0 -DDEBUG
+set build_dbg=%build% -o %out_dbg%\%out_file% -g -O0 -DENGINE_DEBUG
 set build_rel=%build% -o %out_rel%\%out_file% -O2
 
 cls
