@@ -1546,9 +1546,9 @@ static HWND create_win32_window(struct window_params* params)
   HWND hwnd = CreateWindowExW
   (
     0,                          // Optional window styles.
-    WIN32_CLASS_NAME,       // struct window class.
+    WIN32_CLASS_NAME,           // struct window class.
     title_buffer,               // struct window title
-    WIN32_STYLE_DEFAULT,    // struct window style.
+    WIN32_STYLE_DEFAULT,        // struct window style.
     CW_USEDEFAULT,              // X Pos.
     CW_USEDEFAULT,              // Y Pos.
     client_width,               // Width.
