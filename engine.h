@@ -17,15 +17,15 @@
 //
 // Compile Flags:
 //
-// ENGINE_IMPLEMENTATION         Pastes the function implementations.
-// ENGINE_DEBUG        Enables trace, check, ensure macros.
-// ENGINE_API_OPENGL   Uses OpenGL.
-// ENGINE_MODE_CODEGEN Starts with in code-generation mode.
+// ENGINE_IMPLEMENTATION Pastes the function implementations.
+// ENGINE_DEBUG          Enables trace, check, ensure macros.
+// ENGINE_API_OPENGL     Uses OpenGL.
+// ENGINE_MODE_CODEGEN   Starts with in code-generation mode.
 
 #define ENGINE_API_OPENGL // @Note: For now we force the OpenGL implementation.
 
-#ifndef TINY_GAME_FRAMEWORK_H
-#define TINY_GAME_FRAMEWORK_H
+#ifndef ENGINE_H
+#define ENGINE_H
 
 // ============================================================================================
 // @: BEGIN OF DECLARATIONS
@@ -647,7 +647,7 @@ extern struct wgl_context g_wgl_context_array[MAX_WINDOWS];
 
 void clear_screen(union vec4 color);
 
-#endif // TINY_GAME_FRAMEWORK_H
+#endif // ENGINE_H
   
 // ============================================================================================
 // @: END OF DECLARATIONS
