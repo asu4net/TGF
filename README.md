@@ -13,13 +13,17 @@ Features:
 - Keyboard and mouse input.
 - OpenGL context creation.
 - Basic math constructs.
+- Basic metaprogramming.
 
 > **Note:**
 > Almost all features are Windows only for now. 
 
-Installation:
+Usage:
 - Include `engine.h` wherever you want.
 - At least in one translation unit define `ENGINE_IMPLEMENTATION` and include `engine.h`.
+- Call `engine_init` from the main function.
+- If you don't have `.code_gen.h` and `.code_gen.c` generated yet. (is first build).
+    - Build with `ENGINE_MODE_CODEGEN` defined. (flag `-codegen` in `build.bat`)
 - Enjoy.
 
 Linking:
