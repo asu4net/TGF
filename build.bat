@@ -7,7 +7,7 @@ set target=src\main.c
 set out_exe=game.exe
 set out_dbg=.out
 set out_rel=.out\release
-set inc=-Isrc -Isrc\base -Isrc\gpu -Isrc\os -Isrc\codegen
+set inc=-Isrc -Isrc\base -Isrc\gpu -Isrc\os -Isrc\codegen -Isrc\game
 
 set links=-lopengl32 -lgdi32 -luser32 -lwinmm
 set errors=-Werror -Wall -Wextra -Wconversion -Wsign-conversion
