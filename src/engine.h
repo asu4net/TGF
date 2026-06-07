@@ -25,10 +25,10 @@
 // @: BEGIN OF DECLARATIONS
 // ============================================================================================
 
-#include "engine_base.h"
-#include "engine_math.h"
-#include "engine_sys.h"
-#include "engine_arena.h"
+#include "core/base.h"
+#include "core/math.h"
+#include "core/sys.h"
+#include "core/arena.h"
 #include "../.codegen_generated.h"
 
 // ============================================
@@ -277,10 +277,10 @@ void clear_screen(union vec4 color);
 #define ENGINE_IMPLEMENTATION_ARENA
 #define ENGINE_IMPLEMENTATION_STATE
 
-#include "engine_base.h"
-#include "engine_math.h"
-#include "engine_sys.h"
-#include "engine_arena.h"
+#include "core/base.h"
+#include "core/math.h"
+#include "core/sys.h"
+#include "core/arena.h"
 
 #include "../.codegen_generated.c"
 

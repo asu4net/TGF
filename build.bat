@@ -47,7 +47,7 @@ if %use_release%==1 (
 
 if %use_codegen%==1 (
 
-    echo Building %target% in codegen mode...
+    echo Building src\codegen.c...
 
     clang -std=c99 src/codegen.c %links% %errors% -o codegen.exe -O0 -DENGINE_DEBUG -DENGINE_MODE_CODEGEN -Isrc
 
