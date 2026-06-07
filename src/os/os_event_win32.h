@@ -1,13 +1,10 @@
-#ifndef ENGINE_H_OS_EVENT_WIN32
-#define ENGINE_H_OS_EVENT_WIN32
+#ifndef ENGINE_H_EVENT_WIN32
+#define ENGINE_H_EVENT_WIN32
 
-#ifdef ENGINE_OS_WINDOWS
 CALLBACK LRESULT process_events_win32(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-#endif // ENGINE_OS_WINDOWS
-
 void poll_events_win32();
 
-#endif // ENGINE_H_OS_EVENT_WIN32 
+#endif // ENGINE_H_EVENT_WIN32 
 
 #ifdef ENGINE_IMPL_OS_EVENT_WIN32
 

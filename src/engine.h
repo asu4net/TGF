@@ -5,6 +5,7 @@
 #include "base_math.h"
 #include "base_sys.h"
 #include "base_arena.h"
+
 #include "../.codegen_generated.h"
 
 #include "os_key.h"
@@ -12,7 +13,6 @@
 #include "os_event.h"
 #include "os_window.h"
 #include "gpu_context.h"
-#include "engine_state.h"
 
 struct vertex_buffer
 {
@@ -30,10 +30,9 @@ void clear_screen(union vec4 color);
 #define ENGINE_IMPL_MATH
 #define ENGINE_IMPL_SYS
 #define ENGINE_IMPL_ARENA
-#define ENGINE_IMPL_STATE
 #define ENGINE_IMPL_KEY
 #define ENGINE_IMPL_CURSOR
-#define ENGINE_IMPL_EVENT
+#define ENGINE_IMPL_OS_EVENT
 #define ENGINE_IMPL_WINDOW
 #define ENGINE_IMPL_GPU_CONTEXT
 
@@ -49,7 +48,6 @@ void clear_screen(union vec4 color);
 #include "os_event.h"
 #include "os_window.h"
 #include "gpu_context.h"
-#include "engine_state.h"
 
 // ============================================
 // @i: Graphics (OpenGL).
