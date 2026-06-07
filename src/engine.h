@@ -13,14 +13,7 @@
 #include "os_event.h"
 #include "os_window.h"
 #include "gpu_context.h"
-
-struct vertex_buffer
-{
-  struct hmap_handle handle;
-  u32 id;
-};
-
-void clear_screen(union vec4 color);
+#include "gpu_api.h"
 
 #endif // ENGINE_H
   
@@ -35,6 +28,7 @@ void clear_screen(union vec4 color);
 #define ENGINE_IMPL_OS_EVENT
 #define ENGINE_IMPL_WINDOW
 #define ENGINE_IMPL_GPU_CONTEXT
+#define ENGINE_IMPL_GPU_API
 
 #include "base_core.h"
 #include "base_math.h"
@@ -48,19 +42,6 @@ void clear_screen(union vec4 color);
 #include "os_event.h"
 #include "os_window.h"
 #include "gpu_context.h"
-
-// ============================================
-// @i: Graphics (OpenGL).
-// ============================================
-
-#ifdef ENGINE_API_OPENGL
-
-void clear_screen(union vec4 color)
-{
-  glClearColor(color.x, color.y, color.z, color.w);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-#endif // ENGINE_API_OPENGL
+#include "gpu_api.h"
 
 #endif // ENGINE_IMPL

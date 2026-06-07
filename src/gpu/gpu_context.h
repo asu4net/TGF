@@ -15,8 +15,6 @@ void swap_buffers(struct window* window, b8 vsync);
 #include "gpu_context_wgl.h"
 #endif
 
-#ifdef ENGINE_API_OPENGL
-
 void swap_buffers(struct window* window, b8 vsync)
 {
 #if defined(ENGINE_OS_WINDOWS) && defined(ENGINE_API_OPENGL)
@@ -34,7 +32,5 @@ b8 create_gpu_context(struct window* window)
 #error "Not implemented!"
 #endif
 }
-
-#endif
 
 #endif // ENGINE_IMPL_GPU_CONTEXT
