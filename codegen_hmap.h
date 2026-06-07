@@ -2,6 +2,15 @@
 #define CODEGEN_DECLARATION_HMAP
 
 const char* g_template_h_hmap =
+"#ifndef HMAP_HANDLE_DECL                                                           \n"
+"#define HMAP_HANDLE_DECL                                                           \n"
+"struct hmap_handle                                                                 \n"
+"{                                                                                  \n"
+"   u32 index;                                                                      \n"
+"   u32 gen; // Generation of the handle.                                           \n"
+"};                                                                                 \n"
+"#endif // HMAP_HANDLE_DECL                                                         \n"
+"                                                                                   \n"
 "struct $T_hmap                                                                     \n"
 "{                                                                                  \n"
 "   struct $T* data;                                                                \n"
@@ -130,6 +139,7 @@ const char* g_template_c_hmap =
 "  }                                                                                \n"
 "                                                                                   \n"
 "  return false;                                                                    \n"
-"}                                                                                  \n";
+"}                                                                                  \n"
+"                                                                                   \n";
 
 #endif // CODEGEN_DECLARATION_HMAP

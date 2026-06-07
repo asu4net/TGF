@@ -13,22 +13,14 @@
 const char* g_code_gen_h_header = 
 "#ifndef CODEGEN_DECLARATION_GENERATED                                              \n"
 "#define CODEGEN_DECLARATION_GENERATED                                              \n"
-"                                                                                   \n"
-"struct hmap_handle                                                                 \n"
-"{                                                                                  \n"
-"   u32 index;                                                                      \n"
-"   u32 gen; // Generation of the handle.                                           \n"
-"};                                                                                 \n"
 "                                                                                   \n";
 
 const char* g_code_gen_h_footer = 
-"#endif // CODEGEN_DECLARATION_GENERATED                                            \n";
+"#endif // CODEGEN_DECLARATION_GENERATED                                            \n"
+"                                                                                   \n";
 
 const char* g_code_gen_c_header = 
 "#include \".codegen_generated.h\"                                                  \n"
-"                                                                                   \n"
-"                                                                                   \n";
-const char* g_code_gen_c_footer = 
 "                                                                                   \n";
 
 // @Note: Dead simple token replace function.
@@ -88,6 +80,7 @@ s32 main(s32 argc, char** argv)
     u64 footer_len = strlen(g_code_gen_h_footer);
     char* footer = arena_push(arena, footer_len, ALIGN_OF(char), false);
     memcpy(footer, g_code_gen_h_footer, footer_len);
+
     char* terminator = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
     *terminator = '\0';
     char* data = arena_first(arena, char);
@@ -105,9 +98,6 @@ s32 main(s32 argc, char** argv)
     // @Note: Add here your implementation string.
     replace_token(g_template_c_hmap, "$T", "vertex_buffer", arena, false);
 
-    u64 footer_len = strlen(g_code_gen_c_footer);
-    char* footer = arena_push(arena, footer_len, ALIGN_OF(char), false);
-    memcpy(footer, g_code_gen_c_footer, footer_len);
     char* terminator = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
     *terminator = '\0';
     char* data = arena_first(arena, char);
