@@ -217,10 +217,10 @@ struct window* create_window_win32(struct window_params* params)
   // If the input device is created setup the input event arena .
   if (created)
   {
-    check(g_input_events_arena == NULL);
+    check(g_os_events_arena == NULL);
     struct arena_params params = DEFAULT_ARENA_PARAMS;
     params.flags &= ARENA_FLAG_NO_CHAIN;
-    g_input_events_arena = arena_alloc_default();
+    g_os_events_arena = arena_alloc_default();
   }
 
   // Fill the window slot.

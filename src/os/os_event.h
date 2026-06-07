@@ -1,19 +1,19 @@
 #ifndef ENGINE_H_OS_EVENT
 #define ENGINE_H_OS_EVENT
 
-enum input_event_kind 
+enum os_event_kind 
 {
-    INPUT_EVENT_NONE
-  , INPUT_EVENT_KEY
-  , INPUT_EVENT_WINDOW
-  , INPUT_EVENT_MOUSE_MOVE
-  , INPUT_EVENT_MOUSE_WHEEL
-  , INPUT_EVENT_QUIT
+    OS_EVENT_NONE
+  , OS_EVENT_KEY
+  , OS_EVENT_WINDOW
+  , OS_EVENT_MOUSE_MOVE
+  , OS_EVENT_MOUSE_WHEEL
+  , OS_EVENT_QUIT
 };
 
-struct input_event
+struct os_event
 {
-  enum input_event_kind kind;
+  enum os_event_kind kind;
 
   u32 key;
   u32 key_state;
@@ -29,28 +29,28 @@ struct input_event
   s32 mouse_delta_y;
 };
 
-struct input_event_view
+struct os_event_view
 {
-  struct input_event* data;
+  struct os_event* data;
   s32 len;
 };
 
-extern struct arena* g_input_events_arena;
-extern s32 g_input_events_len;
+extern struct arena* g_os_events_arena;
+extern s32 g_os_events_len;
 
-inline struct input_event_view events_this_frame()
+inline struct os_event_view events_this_frame()
 {
-  struct input_event_view view;
-  view.data = arena_first(g_input_events_arena, struct input_event);
-  view.len  = g_input_events_len;
+  struct os_event_view view;
+  view.data = arena_first(g_os_events_arena, struct os_event);
+  view.len  = g_os_events_len;
   return view;
 }
 
 inline void clear_events()
 {
-  check(g_input_events_arena != NULL);
-  arena_clear(g_input_events_arena);
-  g_input_events_len = 0;
+  check(g_os_events_arena != NULL);
+  arena_clear(g_os_events_arena);
+  g_os_events_len = 0;
 }
 
 void poll_events();
@@ -59,8 +59,8 @@ void poll_events();
 
 #ifdef ENGINE_IMPL_OS_EVENT
 
-struct arena* g_input_events_arena = NULL;
-s32 g_input_events_len = 0;
+struct arena* g_os_events_arena = NULL;
+s32 g_os_events_len = 0;
 
 #ifdef ENGINE_OS_WINDOWS
 #define ENGINE_IMPL_OS_EVENT_WIN32

@@ -7,7 +7,8 @@ struct
   b8 vsync;
   union vec4 clear_color;
   struct window* window;
-} game = nil;
+} 
+game = nil;
 
 union vec4 bg_color_a = COLOR_CORN_FLOWER_BLUE;
 union vec4 bg_color_b = COLOR_CHILL_GREEN;
@@ -28,20 +29,20 @@ s32 main(s32 argc, char** argv)
   {
     poll_events();
 
-    struct input_event_view view = events_this_frame();
+    struct os_event_view view = events_this_frame();
 
     // Process events.
     for each_index(i, view.len)
     {
-      struct input_event* ev = &view.data[i];
+      struct os_event* ev = &view.data[i];
 
-      if (ev->kind == INPUT_EVENT_QUIT)
+      if (ev->kind == OS_EVENT_QUIT)
       {
         game.quit = true;
         break;
       }
 
-      if (ev->kind == INPUT_EVENT_KEY && ev->key == KEY_ESCAPE && ev->key_state == KEY_STATE_PRESSED)
+      if (ev->kind == OS_EVENT_KEY && ev->key == KEY_ESCAPE && ev->key_state == KEY_STATE_PRESSED)
       {
         game.quit = true;
         break;
