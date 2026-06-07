@@ -1,5 +1,5 @@
 **/.out
 **.raddbg_user
 **.raddbg_project
-**.code_gen.h
-**.code_gen.c
+**.codegen_generated.h
+**.codegen_generated.c

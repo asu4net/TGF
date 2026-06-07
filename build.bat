@@ -8,11 +8,10 @@ set out_exe=game.exe
 set out_dbg=.out
 set out_rel=.out\release
 
-set includes=-Isrc
 set links=-lopengl32 -lgdi32 -luser32 -lwinmm
 set errors=-Werror -Wall -Wextra -Wconversion -Wsign-conversion
 
-set build=clang -std=c99 %target% %includes% %links% %errors%
+set build=clang -std=c99 %target% %links% %errors%
 set build_dbg=%build% -o %out_dbg%\%out_exe% -g -O0 -DENGINE_DEBUG
 set build_rel=%build% -o %out_rel%\%out_exe% -O2
 
@@ -50,7 +49,7 @@ if %use_codegen%==1 (
 
     echo Building %target% in codegen mode...
 
-    %build% -o codegen.exe -O0 -DENGINE_DEBUG -DENGINE_MODE_CODEGEN
+    clang -std=c99 codegen.c %links% %errors% -o codegen.exe -O0 -DENGINE_DEBUG -DENGINE_MODE_CODEGEN
 
     if !errorlevel! neq 0 (
         echo Codegen build failed.
