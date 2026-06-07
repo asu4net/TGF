@@ -30,7 +30,7 @@ void release(void* ptr, u64 size);
 
 #ifdef ENGINE_OS_WINDOWS
 #define ENGINE_IMPLEMENTATION_SYS_WIN32
-#include "core/sys_win32.h"
+#include "base_sys_win32.h"
 #endif
 
 struct system_info* get_system_info()

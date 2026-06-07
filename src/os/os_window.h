@@ -41,7 +41,7 @@ void swap_buffers(struct window* window, b8 vsync);
 
 #ifdef ENGINE_OS_WINDOWS
 #define ENGINE_IMPLEMENTATION_WNDCREATION_WIN32
-#include "window/wndcreation_win32.h"
+#include "os_window_win32.h"
 #endif
 
 struct window* create_window(struct window_params* params)

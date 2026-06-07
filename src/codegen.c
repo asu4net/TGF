@@ -3,12 +3,12 @@
 #define ENGINE_IMPLEMENTATION_SYS
 #define ENGINE_IMPLEMENTATION_ARENA
 
-#include "core/base.h"
-#include "core/math.h"
-#include "core/sys.h"
-#include "core/arena.h"
+#include "base_core.h"
+#include "base_math.h"
+#include "base_sys.h"
+#include "base_arena.h"
 
-#include "codegen/hmap.h"
+#include "codegen_hmap.h"
 
 const char* g_code_gen_h_header = 
 "#ifndef CODEGEN_DECLARATION_GENERATED                                              \n"

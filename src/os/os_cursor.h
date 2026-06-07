@@ -17,7 +17,7 @@ void set_cursor_mode(enum cursor_mode mode);
 
 #ifdef ENGINE_OS_WINDOWS
 #define ENGINE_IMPLEMENTATION_CURSOR_WIN32
-#include "input/cursor_win32.h"
+#include "os_cursor_win32.h"
 #endif
 
 void update_cursor()

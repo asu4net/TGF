@@ -12,7 +12,7 @@ void swap_buffers(struct window* window, b8 vsync);
 
 #if defined(ENGINE_OS_WINDOWS) && defined(ENGINE_API_OPENGL)
 #define ENGINE_IMPLEMENTATION_GPU_CONTEXT_WGL
-#include "gpu/context_wgl.h"
+#include "gpu_context_wgl.h"
 #endif
 
 #ifdef ENGINE_API_OPENGL

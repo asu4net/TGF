@@ -64,7 +64,7 @@ s32 g_input_events_len = 0;
 
 #ifdef ENGINE_OS_WINDOWS
 #define ENGINE_IMPLEMENTATION_EVENT_WIN32
-#include "input/event_win32.h"
+#include "os_event_win32.h"
 #endif // ENGINE_OS_WINDOWS
 
 void poll_events()

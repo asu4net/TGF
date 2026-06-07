@@ -9,7 +9,7 @@
 // opengl32 (OpenGL) (optional)
 // ---------------------------------
 
-#include "gpu/functions_gl.h"
+#include "gpu_functions_gl.h"
 
 b8 create_context_wgl(struct window* window);
 void swap_buffers_wgl(struct window* window, b8 vsync);
@@ -19,7 +19,7 @@ void swap_buffers_wgl(struct window* window, b8 vsync);
 #ifdef ENGINE_IMPLEMENTATION_GPU_CONTEXT_WGL
 
 #define ENGINE_IMPLEMENTATION_FUNCTIONS_GL
-#include "gpu/functions_gl.h"
+#include "gpu_functions_gl.h"
 
 struct wgl_context
 { 

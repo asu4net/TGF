@@ -1,17 +1,17 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include "core/base.h"
-#include "core/math.h"
-#include "core/sys.h"
-#include "core/arena.h"
+#include "base_core.h"
+#include "base_math.h"
+#include "base_sys.h"
+#include "base_arena.h"
 #include "../.codegen_generated.h"
 
-#include "input/key.h"
-#include "input/cursor.h"
-#include "input/event.h"
-#include "window/wndcreation.h"
-#include "gpu/context.h"
+#include "os_key.h"
+#include "os_cursor.h"
+#include "os_event.h"
+#include "os_window.h"
+#include "gpu_context.h"
 #include "engine_state.h"
 
 struct vertex_buffer
@@ -37,18 +37,18 @@ void clear_screen(union vec4 color);
 #define ENGINE_IMPLEMENTATION_WNDCREATION
 #define ENGINE_IMPLEMENTATION_GPU_CONTEXT
 
-#include "core/base.h"
-#include "core/math.h"
-#include "core/sys.h"
-#include "core/arena.h"
+#include "base_core.h"
+#include "base_math.h"
+#include "base_sys.h"
+#include "base_arena.h"
 
 #include "../.codegen_generated.c"
 
-#include "input/key.h"
-#include "input/cursor.h"
-#include "input/event.h"
-#include "window/wndcreation.h"
-#include "gpu/context.h"
+#include "os_key.h"
+#include "os_cursor.h"
+#include "os_event.h"
+#include "os_window.h"
+#include "gpu_context.h"
 #include "engine_state.h"
 
 // ============================================
