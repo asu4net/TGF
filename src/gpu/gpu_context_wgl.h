@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_GPU_CONTEXT_WGL
-#define ENGINE_DECLARATION_GPU_CONTEXT_WGL
+#ifndef ENGINE_H_GPU_CONTEXT_WGL
+#define ENGINE_H_GPU_CONTEXT_WGL
 
 // Link:
 //
@@ -14,11 +14,11 @@
 b8 create_context_wgl(struct window* window);
 void swap_buffers_wgl(struct window* window, b8 vsync);
 
-#endif // ENGINE_DECLARATION_GPU_CONTEXT_WGL 
+#endif // ENGINE_H_GPU_CONTEXT_WGL 
 
-#ifdef ENGINE_IMPLEMENTATION_GPU_CONTEXT_WGL
+#ifdef ENGINE_IMPL_GPU_CONTEXT_WGL
 
-#define ENGINE_IMPLEMENTATION_FUNCTIONS_GL
+#define ENGINE_IMPL_FUNCTIONS_GL
 #include "gpu_functions_gl.h"
 
 struct wgl_context
@@ -224,4 +224,4 @@ void swap_buffers_wgl(struct window* window, b8 vsync)
   SwapBuffers(context->device);
 }
 
-#endif // ENGINE_IMPLEMENTATION_GPU_CONTEXT_WGL
+#endif // ENGINE_IMPL_GPU_CONTEXT_WGL

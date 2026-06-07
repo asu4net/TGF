@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_MATH
-#define ENGINE_DECLARATION_MATH
+#ifndef ENGINE_H_MATH
+#define ENGINE_H_MATH
 
 // ============================================
 // @: Vec2.
@@ -103,12 +103,12 @@ union vec4
 #define COLOR_YELLOW           vec4_lit(1.000f, 0.920f, 0.016f, 1.000f)
 #define COLOR_ORANGE           vec4_lit(0.970f, 0.600f, 0.110f, 1.000f)
 
-#endif // ENGINE_DECLARATION_MATH
+#endif // ENGINE_H_MATH
 
 // -------------------------------------------------------------------------------------------------
 
-#ifdef ENGINE_IMPLEMENTATION_MATH
+#ifdef ENGINE_IMPL_MATH
 
 
 
-#endif // ENGINE_IMPLEMENTATION_MATH
+#endif // ENGINE_IMPL_MATH

@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_EVENT_WIN32
-#define ENGINE_DECLARATION_EVENT_WIN32
+#ifndef ENGINE_H_EVENT_WIN32
+#define ENGINE_H_EVENT_WIN32
 
 #ifdef ENGINE_OS_WINDOWS
 CALLBACK LRESULT process_events_win32(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -7,9 +7,9 @@ CALLBACK LRESULT process_events_win32(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 
 void poll_events_win32();
 
-#endif // ENGINE_DECLARATION_EVENT_WIN32 
+#endif // ENGINE_H_EVENT_WIN32 
 
-#ifdef ENGINE_IMPLEMENTATION_EVENT_WIN32
+#ifdef ENGINE_IMPL_EVENT_WIN32
 
 static u32 key_from_vk(WPARAM wParam)
 {
@@ -239,4 +239,4 @@ void poll_events_win32()
   }
 }
 
-#endif // ENGINE_IMPLEMENTATION_EVENT_WIN32
+#endif // ENGINE_IMPL_EVENT_WIN32

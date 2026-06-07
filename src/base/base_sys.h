@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_SYS
-#define ENGINE_DECLARATION_SYS
+#ifndef ENGINE_H_SYS
+#define ENGINE_H_SYS
 
 struct system_info 
 {
@@ -22,14 +22,14 @@ void decommit(void* ptr, u64 size);
 
 void release(void* ptr, u64 size);
 
-#endif // ENGINE_DECLARATION_SYS
+#endif // ENGINE_H_SYS
 
 // -------------------------------------------------------------------------------------------------
 
-#ifdef ENGINE_IMPLEMENTATION_SYS
+#ifdef ENGINE_IMPL_SYS
 
 #ifdef ENGINE_OS_WINDOWS
-#define ENGINE_IMPLEMENTATION_SYS_WIN32
+#define ENGINE_IMPL_SYS_WIN32
 #include "base_sys_win32.h"
 #endif
 
@@ -101,4 +101,4 @@ void release(void* ptr, u64 size)
 #endif
 }
 
-#endif // ENGINE_IMPLEMENTATION_SYS
+#endif // ENGINE_IMPL_SYS

@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_STATE
-#define ENGINE_DECLARATION_STATE
+#ifndef ENGINE_H_STATE
+#define ENGINE_H_STATE
 
 typedef void(*CALLBACK_RUN)();
 typedef void(*CALLBACK_PROCESS_EVENTS)(struct input_event* event);
@@ -43,9 +43,9 @@ struct engine_state
 
 void engine_run(struct engine_params* params);
 
-#endif // ENGINE_DECLARATION_STATE
+#endif // ENGINE_H_STATE
 
-#ifdef ENGINE_IMPLEMENTATION_STATE
+#ifdef ENGINE_IMPL_STATE
 
 struct engine_state g_engine = nil;
 
@@ -119,4 +119,4 @@ void engine_run(struct engine_params* params)
 #endif // ENGINE_MODE_CODEGEN;
 }
 
-#endif // ENGINE_IMPLEMENTATION_STATE
+#endif // ENGINE_IMPL_STATE

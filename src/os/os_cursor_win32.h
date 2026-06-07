@@ -1,12 +1,12 @@
-#ifndef ENGINE_DECLARATION_CURSOR_WIN32
-#define ENGINE_DECLARATION_CURSOR_WIN32
+#ifndef ENGINE_H_CURSOR_WIN32
+#define ENGINE_H_CURSOR_WIN32
 
 void update_cursor_win32();
 void set_cursor_mode_win32(enum cursor_mode mode);
 
-#endif // ENGINE_DECLARATION_CURSOR_WIN32 
+#endif // ENGINE_H_CURSOR_WIN32 
 
-#ifdef ENGINE_IMPLEMENTATION_CURSOR_WIN32
+#ifdef ENGINE_IMPL_CURSOR_WIN32
 
 static enum cursor_mode g_cursor_mode_win32 = CURSOR_MODE_DEFAULT;
 
@@ -66,4 +66,4 @@ void set_cursor_mode_win32(enum cursor_mode mode)
   g_cursor_mode_win32 = mode;
 }
 
-#endif // ENGINE_IMPLEMENTATION_CURSOR_WIN32 
+#endif // ENGINE_IMPL_CURSOR_WIN32 

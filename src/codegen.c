@@ -1,7 +1,7 @@
-#define ENGINE_IMPLEMENTATION_BASE
-#define ENGINE_IMPLEMENTATION_MATH
-#define ENGINE_IMPLEMENTATION_SYS
-#define ENGINE_IMPLEMENTATION_ARENA
+#define ENGINE_IMPL_BASE
+#define ENGINE_IMPL_MATH
+#define ENGINE_IMPL_SYS
+#define ENGINE_IMPL_ARENA
 
 #include "base_core.h"
 #include "base_math.h"

@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_KEY
-#define ENGINE_DECLARATION_KEY
+#ifndef ENGINE_H_KEY
+#define ENGINE_H_KEY
 
 enum key_state
 {
@@ -85,9 +85,9 @@ inline void release_all_keys()
   memset(g_key_down_table, 0, sizeof(g_key_down_table));
 }
 
-#endif // ENGINE_DECLARATION_KEY 
+#endif // ENGINE_H_KEY 
 
-#ifdef ENGINE_IMPLEMENTATION_KEY
+#ifdef ENGINE_IMPL_KEY
 
 b8 g_key_down_table[KEY_COUNT] = nil;
 

@@ -1,17 +1,17 @@
-#ifndef ENGINE_DECLARATION_GPU_CONTEXT
-#define ENGINE_DECLARATION_GPU_CONTEXT
+#ifndef ENGINE_H_GPU_CONTEXT
+#define ENGINE_H_GPU_CONTEXT
 
 #define ENGINE_API_OPENGL // @Note: For now we force the OpenGL implementation.
  
 b8 create_gpu_context(struct window* window);
 void swap_buffers(struct window* window, b8 vsync);
 
-#endif // ENGINE_DECLARATION_GPU_CONTEXT 
+#endif // ENGINE_H_GPU_CONTEXT 
 
-#ifdef ENGINE_IMPLEMENTATION_GPU_CONTEXT
+#ifdef ENGINE_IMPL_GPU_CONTEXT
 
 #if defined(ENGINE_OS_WINDOWS) && defined(ENGINE_API_OPENGL)
-#define ENGINE_IMPLEMENTATION_GPU_CONTEXT_WGL
+#define ENGINE_IMPL_GPU_CONTEXT_WGL
 #include "gpu_context_wgl.h"
 #endif
 
@@ -37,4 +37,4 @@ b8 create_gpu_context(struct window* window)
 
 #endif
 
-#endif // ENGINE_IMPLEMENTATION_GPU_CONTEXT
+#endif // ENGINE_IMPL_GPU_CONTEXT

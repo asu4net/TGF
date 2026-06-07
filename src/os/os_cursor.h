@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_CURSOR
-#define ENGINE_DECLARATION_CURSOR
+#ifndef ENGINE_H_CURSOR
+#define ENGINE_H_CURSOR
 
 enum cursor_mode
 {
@@ -11,12 +11,12 @@ enum cursor_mode
 void update_cursor();
 void set_cursor_mode(enum cursor_mode mode);
 
-#endif // ENGINE_DECLARATION_CURSOR 
+#endif // ENGINE_H_CURSOR 
 
-#ifdef ENGINE_IMPLEMENTATION_CURSOR
+#ifdef ENGINE_IMPL_CURSOR
 
 #ifdef ENGINE_OS_WINDOWS
-#define ENGINE_IMPLEMENTATION_CURSOR_WIN32
+#define ENGINE_IMPL_CURSOR_WIN32
 #include "os_cursor_win32.h"
 #endif
 
@@ -38,4 +38,4 @@ void set_cursor_mode(enum cursor_mode mode)
 #endif
 }
 
-#endif // ENGINE_IMPLEMENTATION_CURSOR
+#endif // ENGINE_IMPL_CURSOR

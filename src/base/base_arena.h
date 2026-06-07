@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_ARENA
-#define ENGINE_DECLARATION_ARENA 
+#ifndef ENGINE_H_ARENA
+#define ENGINE_H_ARENA 
 
 #define ARENA_HEADER_SIZE 128
 #define ARENA_FREE_LIST 1
@@ -72,11 +72,11 @@ void            temp_end              (struct temp temp);
 #define arena_push_element(a, T) (T*) arena_push((a), sizeof(T), ALIGN_OF(T), (1))
 #define arena_first(a, T) (T*) arena_first_raw((a), ALIGN_OF(T))
 
-#endif // ENGINE_DECLARATION_ARENA 
+#endif // ENGINE_H_ARENA 
 
 // -------------------------------------------------------------------------------------------------
 
-#ifdef ENGINE_IMPLEMENTATION_ARENA
+#ifdef ENGINE_IMPL_ARENA
 
 struct arena* arena_alloc(struct arena_params* params)
 {
@@ -335,4 +335,4 @@ void temp_end(struct temp temp)
   arena_pop_to(temp.arena, temp.pos);
 }
 
-#endif // ENGINE_IMPLEMENTATION_ARENA 
+#endif // ENGINE_IMPL_ARENA 

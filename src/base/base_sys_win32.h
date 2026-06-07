@@ -1,5 +1,5 @@
-#ifndef ENGINE_DECLARATION_SYS_WIN32
-#define ENGINE_DECLARATION_SYS_WIN32
+#ifndef ENGINE_H_SYS_WIN32
+#define ENGINE_H_SYS_WIN32
 
 struct system_info* get_system_info_win32();
 
@@ -15,11 +15,11 @@ void decommit_win32(void* ptr, u64 size);
 
 void release_win32(void* ptr, u64 size);
 
-#endif // ENGINE_DECLARATION_SYS_WIN32
+#endif // ENGINE_H_SYS_WIN32
 
 // -------------------------------------------------------------------------------------------------
 
-#ifdef ENGINE_IMPLEMENTATION_SYS_WIN32
+#ifdef ENGINE_IMPL_SYS_WIN32
 
 static struct system_info g_system_info_win32 = nil;
 
@@ -75,4 +75,4 @@ void release_win32(void* ptr, u64 size)
   VirtualFree(ptr, 0, MEM_RELEASE);
 }
 
-#endif // ENGINE_IMPLEMENTATION_SYS_WIN32
+#endif // ENGINE_IMPL_SYS_WIN32

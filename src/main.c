@@ -1,4 +1,4 @@
-#define ENGINE_IMPLEMENTATION
+#define ENGINE_IMPL
 #include "engine.h"
 
 union vec4 bg_color_a = COLOR_CORN_FLOWER_BLUE;
