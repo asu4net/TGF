@@ -29,7 +29,7 @@
 #include "engine_math.h"
 #include "engine_sys.h"
 #include "engine_arena.h"
-#include ".codegen_generated.h"
+#include "../.codegen_generated.h"
 
 // ============================================
 // @: Window.
@@ -282,7 +282,7 @@ void clear_screen(union vec4 color);
 #include "engine_sys.h"
 #include "engine_arena.h"
 
-#include ".codegen_generated.c"
+#include "../.codegen_generated.c"
 
 #include "engine_state.h"
 
