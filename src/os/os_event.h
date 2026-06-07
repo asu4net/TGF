@@ -1,5 +1,5 @@
-#ifndef ENGINE_H_EVENT
-#define ENGINE_H_EVENT
+#ifndef ENGINE_H_OS_EVENT
+#define ENGINE_H_OS_EVENT
 
 enum input_event_kind 
 {
@@ -55,15 +55,15 @@ inline void clear_events()
 
 void poll_events();
 
-#endif // ENGINE_H_EVENT 
+#endif // ENGINE_H_OS_EVENT 
 
-#ifdef ENGINE_IMPL_EVENT
+#ifdef ENGINE_IMPL_OS_EVENT
 
 struct arena* g_input_events_arena = NULL;
 s32 g_input_events_len = 0;
 
 #ifdef ENGINE_OS_WINDOWS
-#define ENGINE_IMPL_EVENT_WIN32
+#define ENGINE_IMPL_OS_EVENT_WIN32
 #include "os_event_win32.h"
 #endif // ENGINE_OS_WINDOWS
 
@@ -76,4 +76,4 @@ void poll_events()
 #endif
 }
 
-#endif // ENGINE_IMPL_EVENT
+#endif // ENGINE_IMPL_OS_EVENT

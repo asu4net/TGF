@@ -1,5 +1,5 @@
-#ifndef ENGINE_H_WNDCREATION
-#define ENGINE_H_WNDCREATION
+#ifndef ENGINE_H_WINDOW
+#define ENGINE_H_WINDOW
 
 #define MAX_WINDOWS 30
 
@@ -35,12 +35,12 @@ inline struct window* create_window_default()
 void destroy_window(struct window* window);
 void swap_buffers(struct window* window, b8 vsync);
 
-#endif // ENGINE_H_WNDCREATION 
+#endif // ENGINE_H_WINDOW 
 
-#ifdef ENGINE_IMPL_WNDCREATION
+#ifdef ENGINE_IMPL_WINDOW
 
 #ifdef ENGINE_OS_WINDOWS
-#define ENGINE_IMPL_WNDCREATION_WIN32
+#define ENGINE_IMPL_WINDOW_WIN32
 #include "os_window_win32.h"
 #endif
 
@@ -62,4 +62,4 @@ void destroy_window(struct window* window)
 #endif
 }
 
-#endif // ENGINE_IMPL_WNDCREATION
+#endif // ENGINE_IMPL_WINDOW

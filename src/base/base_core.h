@@ -1,5 +1,5 @@
-#ifndef ENGINE_H_BASE
-#define ENGINE_H_BASE 
+#ifndef ENGINE_H_CORE
+#define ENGINE_H_CORE 
 
 // Platform detection.
 #ifdef _WIN64
@@ -158,11 +158,11 @@ b8 is_integer_type(enum data_type type);
 u32 get_type_size(enum data_type type);
 u32 get_type_len(enum data_type type);
 
-#endif // ENGINE_H_BASE
+#endif // ENGINE_H_CORE
 
 // -------------------------------------------------------------------------------------------------
 
-#ifdef ENGINE_IMPL_BASE
+#ifdef ENGINE_IMPL_CORE
 
 #ifdef ENGINE_DEBUG
 
@@ -274,4 +274,4 @@ u32 get_type_len(enum data_type type)
   }
 }
 
-#endif // ENGINE_IMPL_BASE
+#endif // ENGINE_IMPL_CORE

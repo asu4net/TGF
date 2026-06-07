@@ -1,14 +1,14 @@
-#ifndef ENGINE_H_WNDCREATION_WIN32
-#define ENGINE_H_WNDCREATION_WIN32
+#ifndef ENGINE_H_WINDOW_WIN32
+#define ENGINE_H_WINDOW_WIN32
 
 HWND create_raw_window_win32(struct window_params* params);
 
 struct window* create_window_win32(struct window_params* params);
 void destroy_window_win32(struct window*  window);
 
-#endif // ENGINE_H_WNDCREATION_WIN32 
+#endif // ENGINE_H_WINDOW_WIN32 
 
-#ifdef ENGINE_IMPL_WNDCREATION_WIN32
+#ifdef ENGINE_IMPL_WINDOW_WIN32
 
 #define WIN32_CLASS_NAME L"Window Class"
 #define WIN32_STYLE_WINDOWED    WS_OVERLAPPEDWINDOW
@@ -285,4 +285,4 @@ void destroy_window_win32(struct window* window)
   g_window_array.len -= 1;
 }
 
-#endif // ENGINE_IMPL_WNDCREATION_WIN32
+#endif // ENGINE_IMPL_WINDOW_WIN32

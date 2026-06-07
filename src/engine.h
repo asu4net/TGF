@@ -26,7 +26,7 @@ void clear_screen(union vec4 color);
   
 #ifdef ENGINE_IMPL
 
-#define ENGINE_IMPL_BASE
+#define ENGINE_IMPL_CORE
 #define ENGINE_IMPL_MATH
 #define ENGINE_IMPL_SYS
 #define ENGINE_IMPL_ARENA
@@ -34,7 +34,7 @@ void clear_screen(union vec4 color);
 #define ENGINE_IMPL_KEY
 #define ENGINE_IMPL_CURSOR
 #define ENGINE_IMPL_EVENT
-#define ENGINE_IMPL_WNDCREATION
+#define ENGINE_IMPL_WINDOW
 #define ENGINE_IMPL_GPU_CONTEXT
 
 #include "base_core.h"
