@@ -7,7 +7,7 @@ set target=src\main.c
 set out_exe=game.exe
 set out_dbg=.out
 set out_rel=.out\release
-set inc=-Isrc -Isrc\base -Isrc\gpu -Isrc\os -Isrc\codegen -Isrc\game
+set inc=-Isrc -Isrc\base -Isrc\gpu -Isrc\os -Isrc\template -Isrc\game
 
 set links=-lopengl32 -lgdi32 -luser32 -lwinmm
 set errors=-Werror -Wall -Wextra -Wconversion -Wsign-conversion
@@ -48,9 +48,9 @@ if %use_release%==1 (
 
 if %use_codegen%==1 (
 
-    echo Building src\codegen.c...
+    echo Building src\main_codegen.c...
 
-    clang -std=c99 src/codegen.c %links% %errors% -o codegen.exe -O0 -DENGINE_DEBUG -DENGINE_MODE_CODEGEN %inc%
+    clang -std=c99 src/main_codegen.c %links% %errors% -o codegen.exe -O0 -DENGINE_DEBUG -DENGINE_MODE_CODEGEN %inc%
 
     if !errorlevel! neq 0 (
         echo Codegen build failed.

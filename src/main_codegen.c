@@ -8,7 +8,7 @@
 #include "base_sys.h"
 #include "base_arena.h"
 
-#include "codegen_hmap.h"
+#include "template_hmap.h"
 
 const char* g_code_gen_h_header = 
 "#ifndef CODEGEN_DECLARATION_GENERATED                                              \n"
