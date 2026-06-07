@@ -59,6 +59,7 @@ void engine_run(struct engine_params* params)
   g_engine.clear_color = COLOR_CHILL_GREEN;
   g_engine.vsync = true;
   g_engine.window = create_window_default();
+  create_gpu_context(g_engine.window);
   g_engine.callbacks = params->callbacks;
 
   if (g_engine.callbacks.run)

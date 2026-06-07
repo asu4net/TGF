@@ -27,6 +27,8 @@
 #include <Windows.h>
 #endif
 
+#define ENGINE_API_OPENGL // @Note: For now we force the OpenGL implementation.
+
 #ifdef ENGINE_API_OPENGL
 #include "GL/GL.h"
 #endif

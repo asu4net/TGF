@@ -228,12 +228,6 @@ struct window* create_window_win32(struct window_params* params)
   window->index  = g_window_array.len;
   g_window_array.len += 1;
 
-#ifdef ENGINE_API_OPENGL
-  // @Review: Create the opengl context.
-  b8 success = gl_context_create(window);
-  UNUSED(success);
-#endif
-  
   // Show the window.
   SetForegroundWindow(hwnd);
   UpdateWindow(hwnd);
@@ -290,18 +284,5 @@ void destroy_window_win32(struct window* window)
   memset(window, 0, sizeof(struct window));
   g_window_array.len -= 1;
 }
-
-#ifdef ENGINE_API_OPENGL
-
-void swap_buffers(struct window*  window, b8 vsync)
-{
-  wglSwapIntervalEXT(vsync ? 1 : 0);
-  check(window->handle != NULL);
-  struct wgl_context* context = &g_wgl_context_array[window->index];
-  check(context->device != NULL);
-  SwapBuffers(context->device);
-}
-
-#endif
 
 #endif // ENGINE_IMPLEMENTATION_WNDCREATION_WIN32

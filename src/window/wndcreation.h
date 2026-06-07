@@ -33,10 +33,7 @@ inline struct window* create_window_default()
 }
 
 void destroy_window(struct window* window);
-
-#ifdef ENGINE_API_OPENGL
 void swap_buffers(struct window* window, b8 vsync);
-#endif
 
 #endif // ENGINE_DECLARATION_WNDCREATION 
 
