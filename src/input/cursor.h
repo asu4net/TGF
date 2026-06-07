@@ -38,4 +38,4 @@ void set_cursor_mode(enum cursor_mode mode)
 #endif
 }
 
-#endif
+#endif // ENGINE_IMPLEMENTATION_CURSOR

@@ -80,6 +80,11 @@ inline void set_key_down(u32 key, b8 down)
   g_key_down_table[key] = down;
 }
 
+inline void release_all_keys()
+{
+  memset(g_key_down_table, 0, sizeof(g_key_down_table));
+}
+
 #endif // ENGINE_DECLARATION_KEY 
 
 #ifdef ENGINE_IMPLEMENTATION_KEY
