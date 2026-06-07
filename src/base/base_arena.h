@@ -52,7 +52,6 @@ struct temp
   u64 pos;
 };
 
-struct arena*   arena_alloc_default   ();
 struct arena*   arena_alloc           (struct arena_params* params);
 void            arena_release         (struct arena* arena);
 void*           arena_push            (struct arena* arena, u64 size, u64 align, b8 zero);
@@ -110,6 +109,7 @@ struct arena* arena_alloc(struct arena_params* params)
     }
     
     // @Pending: Keep track of allocations like raddebugger does.
+    trace("*** Arena allocation: %u bytes reserved, %u commited from %s:%i\n", reserve_size, commit_size, params->allocation_site_file, params->allocation_site_line);
     //raddbg_annotate_vaddr_range(base, reserve_size, "arena %s:%i", params->allocation_site_file, params->allocation_site_line);
   }
   
@@ -136,18 +136,13 @@ struct arena* arena_alloc(struct arena_params* params)
   return arena;
 }
 
-struct arena* arena_alloc_default()
-{
-  struct arena_params params = DEFAULT_ARENA_PARAMS;
-  return arena_alloc(&params);
-}
-
 void arena_release(struct arena* arena)
 {
   for(struct arena* n = arena->current, *prev = 0; n != 0; n = prev)
   {
     prev = n->prev;
     release(n, n->res);
+    trace("*** Arena freed: %u bytes.", arena->cmt);
   }
 }
 

@@ -220,7 +220,7 @@ struct window* create_window_win32(struct window_params* params)
     check(g_os_events_arena == NULL);
     struct arena_params params = DEFAULT_ARENA_PARAMS;
     params.flags &= ARENA_FLAG_NO_CHAIN;
-    g_os_events_arena = arena_alloc_default();
+    g_os_events_arena = arena_alloc(&params);
   }
 
   // Fill the window slot.

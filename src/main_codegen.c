@@ -66,7 +66,8 @@ s32 main(s32 argc, char** argv)
 {
   UNUSED(argc);
   UNUSED(argv);
-  struct arena* arena = arena_alloc_default();
+  struct arena_params params = DEFAULT_ARENA_PARAMS;
+  struct arena* arena = arena_alloc(&params);
   {
     FILE* file = NULL;
     fopen_s(&file, ".codegen_generated.h", "w");
