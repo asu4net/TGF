@@ -1,12 +1,6 @@
 #ifndef ENGINE_H_GPU_API
 #define ENGINE_H_GPU_API
 
-struct vertex_buffer
-{
-  struct hmap_handle handle;
-  u32 id;
-};
-
 void clear_screen(union vec4 color);
 
 #endif // ENGINE_H_GPU_API 

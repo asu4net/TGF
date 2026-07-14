@@ -35,13 +35,13 @@
 #include "base_sys.h"
 #include "base_arena.h"
 
-#include "../.codegen_generated.c"
-
 #include "os_key.h"
 #include "os_cursor.h"
 #include "os_event.h"
 #include "os_window.h"
 #include "gpu_context.h"
 #include "gpu_api.h"
+
+#include "../.codegen_generated.c"
 
 #endif // ENGINE_IMPL

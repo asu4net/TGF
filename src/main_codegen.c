@@ -76,7 +76,7 @@ s32 main(s32 argc, char** argv)
     memcpy(header, g_code_gen_h_header, header_len);
 
     // @Note: Add here your declaration string.
-    replace_token(g_template_h_hmap, "$T", "vertex_buffer", arena, false);
+    replace_token(g_template_h_hmap, "$T", "gl_vertex_buffer", arena, false);
 
     u64 footer_len = strlen(g_code_gen_h_footer);
     char* footer = arena_push(arena, footer_len, ALIGN_OF(char), false);
@@ -97,7 +97,7 @@ s32 main(s32 argc, char** argv)
     memcpy(header, g_code_gen_c_header, header_len);
 
     // @Note: Add here your implementation string.
-    replace_token(g_template_c_hmap, "$T", "vertex_buffer", arena, false);
+    replace_token(g_template_c_hmap, "$T", "gl_vertex_buffer", arena, false);
 
     char* terminator = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
     *terminator = '\0';
