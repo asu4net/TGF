@@ -11,16 +11,20 @@
 #include "template_hmap.h"
 
 const char* g_code_gen_h_header = 
-"#ifndef CODEGEN_DECLARATION_GENERATED                                              \n"
-"#define CODEGEN_DECLARATION_GENERATED                                              \n"
+"#ifndef ENGINE_H_GENERATED                                                         \n"
+"#define ENGINE_H_GENERATED                                                         \n"
 "                                                                                   \n";
 
 const char* g_code_gen_h_footer = 
-"#endif // CODEGEN_DECLARATION_GENERATED                                            \n"
+"#endif // ENGINE_H_GENERATED                                                       \n"
 "                                                                                   \n";
 
 const char* g_code_gen_c_header = 
-"#include \".codegen_generated.h\"                                                  \n"
+"#ifdef ENGINE_IMPL_GENERATED                                                       \n"
+"                                                                                   \n";
+
+const char* g_code_gen_c_footer = 
+"#endif // ENGINE_IMPL_GENERATED                                                    \n"
 "                                                                                   \n";
 
 // @Note: Dead simple token replace function.
@@ -61,31 +65,19 @@ s32 main(s32 argc, char** argv)
   struct arena* arena = arena_alloc(&params);
   {
     FILE* file = NULL;
-    fopen_s(&file, ".codegen_generated.h", "w");
+    fopen_s(&file, "src/generated.h", "w");
+
     arena_push_cstring(arena, g_code_gen_h_header);
-
-    // @Note: Add here your declaration string.
     replace_token(g_template_h_hmap, "$T", "gl_vertex_buffer", arena);
-
     arena_push_cstring(arena, g_code_gen_h_footer);
-    arena_push_char(arena, '\0');
 
-    fputs(arena_first(arena, char), file);
-    fclose(file);
-  }
-  arena_clear(arena);
-  {
-    FILE* file = NULL;
-    fopen_s(&file, ".codegen_generated.c", "w");
     arena_push_cstring(arena, g_code_gen_c_header);
-
-    // @Note: Add here your implementation string.
     replace_token(g_template_c_hmap, "$T", "gl_vertex_buffer", arena);
+    arena_push_cstring(arena, g_code_gen_c_footer);
 
     arena_push_char(arena, '\0');
 
     fputs(arena_first(arena, char), file);
     fclose(file);
   }
-  // We are on "comptime" so we don't need to release the arena.
 }

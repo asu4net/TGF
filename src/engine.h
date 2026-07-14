@@ -6,7 +6,7 @@
 #include "base_sys.h"
 #include "base_arena.h"
 
-#include "../.codegen_generated.h"
+#include "generated.h"
 
 #include "os_key.h"
 #include "os_cursor.h"
@@ -29,6 +29,7 @@
 #define ENGINE_IMPL_WINDOW
 #define ENGINE_IMPL_GPU_CONTEXT
 #define ENGINE_IMPL_GPU_API
+#define ENGINE_IMPL_GENERATED
 
 #include "base_core.h"
 #include "base_math.h"
@@ -42,6 +43,6 @@
 #include "gpu_context.h"
 #include "gpu_api.h"
 
-#include "../.codegen_generated.c"
+#include "generated.h"
 
 #endif // ENGINE_IMPL
