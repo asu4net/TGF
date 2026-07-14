@@ -24,17 +24,15 @@ const char* g_code_gen_c_header =
 "                                                                                   \n";
 
 // @Note: Dead simple token replace function.
-static void replace_token(const char* src, const char* token, const char* replace, struct arena* arena, b8 add_null_terminator)
+static void replace_token(const char* src, const char* token, const char* replace, struct arena* arena)
 {
-  u64 replace_len = strlen(replace);
   u64 token_len = strlen(token);
   u64 token_index = 0;
   for each_index(i, (s32) strlen(src))
   {
     char c = src[i];
     // Paste the char.
-    char* pc = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
-    *pc = c;
+    arena_push_char(arena, c);
 
     if (c == token[token_index])
     {
@@ -43,8 +41,7 @@ static void replace_token(const char* src, const char* token, const char* replac
       {
         // Token recognized, paste the replace.
         arena_pop(arena, token_len);
-        char* replace_begin = arena_push(arena, replace_len, ALIGN_OF(char), false);
-        memcpy(replace_begin, replace, replace_len);
+        arena_push_cstring(arena, replace);
         token_index = 0;
       }
     }
@@ -53,56 +50,41 @@ static void replace_token(const char* src, const char* token, const char* replac
       token_index = 0;
     }
   }
-
-  if (add_null_terminator)
-  {
-    char* pc = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
-    *pc = '\0';
-  }
 }
 
-// @Note: This is fucking ugly, but gets the job done.
+// @Note: This is ugly, but gets the job done.
 s32 main(s32 argc, char** argv) 
 {
-  UNUSED(argc);
-  UNUSED(argv);
+  UNUSED(argc); UNUSED(argv);
+
   struct arena_params params = DEFAULT_ARENA_PARAMS;
   struct arena* arena = arena_alloc(&params);
   {
     FILE* file = NULL;
     fopen_s(&file, ".codegen_generated.h", "w");
-    u64 header_len = strlen(g_code_gen_h_header);
-    char* header = arena_push(arena, header_len, ALIGN_OF(char), false);
-    memcpy(header, g_code_gen_h_header, header_len);
+    arena_push_cstring(arena, g_code_gen_h_header);
 
     // @Note: Add here your declaration string.
-    replace_token(g_template_h_hmap, "$T", "gl_vertex_buffer", arena, false);
+    replace_token(g_template_h_hmap, "$T", "gl_vertex_buffer", arena);
 
-    u64 footer_len = strlen(g_code_gen_h_footer);
-    char* footer = arena_push(arena, footer_len, ALIGN_OF(char), false);
-    memcpy(footer, g_code_gen_h_footer, footer_len);
+    arena_push_cstring(arena, g_code_gen_h_footer);
+    arena_push_char(arena, '\0');
 
-    char* terminator = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
-    *terminator = '\0';
-    char* data = arena_first(arena, char);
-    fputs(data, file);
+    fputs(arena_first(arena, char), file);
     fclose(file);
   }
   arena_clear(arena);
   {
     FILE* file = NULL;
     fopen_s(&file, ".codegen_generated.c", "w");
-    u64 header_len = strlen(g_code_gen_c_header);
-    char* header = arena_push(arena, header_len, ALIGN_OF(char), false);
-    memcpy(header, g_code_gen_c_header, header_len);
+    arena_push_cstring(arena, g_code_gen_c_header);
 
     // @Note: Add here your implementation string.
-    replace_token(g_template_c_hmap, "$T", "gl_vertex_buffer", arena, false);
+    replace_token(g_template_c_hmap, "$T", "gl_vertex_buffer", arena);
 
-    char* terminator = (char*) arena_push(arena, 1, ALIGN_OF(char), false);
-    *terminator = '\0';
-    char* data = arena_first(arena, char);
-    fputs(data, file);
+    arena_push_char(arena, '\0');
+
+    fputs(arena_first(arena, char), file);
     fclose(file);
   }
   // We are on "comptime" so we don't need to release the arena.

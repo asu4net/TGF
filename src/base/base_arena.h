@@ -55,6 +55,8 @@ struct temp
 struct arena*   arena_alloc           (struct arena_params* params);
 void            arena_release         (struct arena* arena);
 void*           arena_push            (struct arena* arena, u64 size, u64 align, b8 zero);
+char*           arena_push_cstring    (struct arena* arena, const char* s);
+char*           arena_push_char       (struct arena* arena, char c);
 u64             arena_pos             (struct arena* arena);
 void            arena_pop_to          (struct arena* arena, u64 pos);
 void*           arena_first_raw       (struct arena* arena, u64 align);
@@ -251,6 +253,23 @@ void* arena_push(struct arena* arena, u64 size, u64 align, b8 zero)
   
   check_msg(result != 0, "Unexpected memory allocation failure.");
   return result;
+}
+
+char* arena_push_cstring(struct arena* arena, const char* s)
+{
+  u64 len = strlen(s);
+  char* data = arena_push(arena, len, ALIGN_OF(char), false);
+  check_msg(data != NULL, "Couldn't allocate the cstring");
+  memcpy(data, s, len);
+  return data;
+}
+
+char* arena_push_char(struct arena* arena, char c)
+{
+  char* pc  = arena_push(arena, 1, ALIGN_OF(char), false);
+  check_msg(pc != NULL, "Couldn't allocate the char");
+  *pc = c;
+  return pc;
 }
 
 u64 arena_pos(struct arena* arena)
